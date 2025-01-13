@@ -3,7 +3,7 @@ import router from '@ohos.router';
 @Entry
 @Component
 struct LauncherPage {
-    private countDownSeconds : number = 3  //登录界面持续时间，后面删除
+    private countDownSeconds : number = 3  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
     onPageShow(): void {
         this.timeId = setInterval(() => {
@@ -17,7 +17,7 @@ struct LauncherPage {
 
     build() {
         RelativeContainer() {
-            Text("这里实现登录注册界面，通过则进入app主页，否则保持登录界面。\n")
+            Text("这里实现登录注册界面，正确则进入app主页，否则保持登录界面。\n")
               .id('Launch')
               .fontSize(20)
               .alignRules({
