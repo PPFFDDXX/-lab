@@ -1,0 +1,36 @@
+{
+  "float": [
+    {
+      "name": "launcher_logo_size",
+      "value": "80vp"
+    },
+    {
+      "name": "app_logo_size",
+      "value": "50vp"
+    },
+    {
+      "name": "custom_tab_height_size",
+      "value":  "40"
+    },
+    {
+      "name": "custom_tab_image_size",
+      "value": "28"
+    },
+    {
+      "name": "custom_tab_image_container_size",
+      "value": "37"
+    },
+    {
+      "name": "custom_tab_text_font_size",
+      "value": "14"
+    },
+    {
+      "name": "home_time_day_font_size",
+      "value": "40"
+    },
+    {
+      "name": "home_time_monyear_font_size",
+      "value": "15"
+    }
+  ]
+}

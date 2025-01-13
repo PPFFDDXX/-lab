@@ -3,6 +3,14 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "tabBar_font",
+      "value": "#000000"
+    },
+    {
+      "name": "home_sentence_capture",
+      "value": "#D3D3D3"
     }
   ]
 }
