@@ -1,8 +1,11 @@
 import router from '@ohos.router';
+import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @Component
 struct LauncherPage {
+  @State account:string='';
+  @State password:string='';
     private countDownSeconds : number = 300  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
     onPageShow(): void {
@@ -47,27 +50,62 @@ struct LauncherPage {
           .margin({ top:"25vp",bottom:'10vp' })
         TextInput({placeholder:'请输入账号'})
           .margin({bottom:'10vp'})
+          .width('320vp')
+          .onChange((value:string)=>{
+            this.account=value;
+          })
         TextInput({placeholder:'请输入密码'})
           .type(InputType.Password)
+          .width('320vp')
+          .onChange((value:string)=>{
+            this.password=value;
+          })
           .margin({bottom:'20vp'})
         Button('登录').width('100%').type(ButtonType.Capsule)
           .margin({bottom:'15vp'})
-          .width('200vp')
+          .width('150vp')
+          .onClick(()=>{
+            this.login();
+          })
+        Text('注册账号').fontColor(Color.Blue).fontSize(14)
           .onClick(()=>{
 
           })
-        Button(){
-          Text('注册账号').fontColor(Color.Blue).fontSize(14)
-        }
-        .backgroundColor(Color.White)
-        .onClick(()=>{
-
-        })
         LoadingProgress().width(50).height(50).color(Color.Blue)
         Blank()
 
       }.border({width:1})
       .width("100%")
       .height("100%")
+      .alignItems(HorizontalAlign.Center)
+      .justifyContent((FlexAlign.Center))
+    }
+    login(){
+      //判断是否存在账号
+      if(514==514){
+        promptAction.showToast({
+          message:this.account,
+          duration:2000
+        })
+      }
+      else{
+        promptAction.showToast({
+          message:"不存在的账号",
+          duration:2000
+        })
+      }
+      //判断密码是否正确
+      if(114==114){
+        promptAction.showToast({
+          message:"登录成功",
+          duration:2000
+        })
+      }
+      else{
+        promptAction.showToast({
+          message:"密码错误",
+          duration:2000
+        })
+      }
     }
 }
