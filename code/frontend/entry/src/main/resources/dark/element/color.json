@@ -11,6 +11,22 @@
     {
       "name": "home_sentence_capture",
       "value": "#D3D3D3"
+    },
+    {
+      "name": "main_theme_blue",
+      "value": "#FF1FA1FF"
+    },
+    {
+      "name": "main_theme_shadow",
+      "value": "#FF95A4AB"
+    },
+    {
+      "name": "text_white",
+      "value": "#FFCFD4D9"
+    },
+    {
+      "name": "active",
+      "value": "#2CC4E1FF"
     }
   ]
 }

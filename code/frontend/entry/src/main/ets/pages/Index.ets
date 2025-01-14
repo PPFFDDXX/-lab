@@ -1,7 +1,9 @@
-import { CustomTabBar } from '../components/CustomTabBar'
 import { TAB_INFO } from '../model/TabBarClass'
 import { TabBarClass } from '../model/TabBarClass'
+import {BillInfo,TempBills} from '../model/BillInfo'
 
+import { CustomTabBar } from '../components/CustomTabBar'
+import {BillPage} from '../components/BillPage'
 
 @Entry
 @Component
@@ -10,7 +12,20 @@ struct Index {
 
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
+
+    @State billInfo: BillInfo[] = [];
     private controller: TabsController = new TabsController();
+
+    onPageHide(): void {
+    }
+    aboutToAppear(): void {
+        this.billInfo = TempBills;
+
+    }
+    onPageShow(): void {
+        //这里调用函数获取数据吗?还是在登录界面实现
+        this.billInfo = TempBills;
+    }
 
     build() {
         Column() {
@@ -29,7 +44,10 @@ struct Index {
                 TabContent() {
                     //ProfilePage()
                     //HomePage()
-                    Text("明细")
+                    BillPage({
+                        billInfo:$billInfo
+                    })
+                        .height('100%')
                 }
 
                 TabContent() {

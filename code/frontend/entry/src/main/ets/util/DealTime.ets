@@ -13,15 +13,38 @@ export function getCurrentDay(): string {
     const day = currentDate.getDate();
     if (day < 10) {
         return '0' + day.toString();
-    }
-    else {
+    } else {
         return day.toString();
     }
 }
 
+/*
+*这是一个格式化日期的函数
+* 如FormatDate(new Date(2025,1,14),'m'),调用返回1
+ */
+export function FormatDate(date: Date, format: string): string {
+    let result: string = '';
+    if (format == 'd' || format == 'D') {
+        result = date.getDay().toString();
+    } else if (format == 'm' || format == 'M') {
+        result = (date.getMonth() + 1).toString();
+    } else if (format == 'y' || format == 'Y') {
+        result = date.getFullYear().toString();
+    }
+
+    return result;
+}
 
 /*
-* 这是一个获取并格式处理年乐的函数
+* 这是一个将字符串date转换成Date类型的函数
+ */
+export function Translate(date:string):Date {
+    return new Date(date)
+}
+
+
+/*
+* 这是一个获取并格式处理年月的函数
 * 如 2024/12/03 ，调用返回 'Dec.2024'
 */
 export function getCurrentMonYear(): string {

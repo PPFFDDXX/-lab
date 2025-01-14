@@ -11,6 +11,18 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "app_title",
+      "value": "鸿蒙记账"
+    },
+    {
+      "name": "balance",
+      "value": "支出"
+    },
+    {
+      "name": "income",
+      "value": "收入"
     }
   ]
 }
