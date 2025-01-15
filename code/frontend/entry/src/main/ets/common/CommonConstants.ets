@@ -15,3 +15,4 @@ export class CommonConstants {
     // 动画播放次数
     static readonly CUSTOM_ANIMATION_ITERATIONS: number = 1;
 }
+

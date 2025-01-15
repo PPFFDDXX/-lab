@@ -1,9 +1,11 @@
 import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
-
+import http from '@ohos.net.http';
+import {ap} from '../common/trans';
 @Entry
 @Component
 struct LauncherPage {
+
   @State account:string='';
   @State password:string='';
     private countDownSeconds : number = 100  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
@@ -84,35 +86,50 @@ struct LauncherPage {
     }
     login(){
         //判断是否存在账号
-
-        if(514==514){
+        if(this.account==''||this.password==''){
             promptAction.showToast({
-                message:this.account,
+                message:'账号或密码不能为空',
                 duration:2000
             })
+            return
         }
-        else{
-            promptAction.showToast({
-                message:"不存在的账号",
-                duration:2000
+        const httpReq=http.createHttp()
+        const serve=httpReq.request('http://127.0.0.1:5000/api/sign',{
+            method:http.RequestMethod.POST,
+            header:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                is_sign_up:false,
+                user_name:this.account,
+                password:this.password
             })
-        }
-        //判断密码是否正确
-        if(114==114){
-            promptAction.showToast({
-                message:"登录成功",
-                duration:2000
-            })
-            router.replaceUrl({
-                url:'pages/Index'
-            })
-        }
-        else{
-            promptAction.showToast({
-                message:"密码错误",
-                duration:2000
-            })
-        }
+        })
+        serve.then(res=>{
+            //
+            if(res.result&&JSON.parse(res.result as string).code==-2){
+                promptAction.showToast({
+                    message:"不存在的账号",
+                    duration:2000
+                })
+                return
+            }
+            else if(res.result&&JSON.parse(res.result as string).code==-1){
+                promptAction.showToast({
+                    message:"密码错误",
+                    duration:2000
+                })
+                return
+            }
+        })
+        ap.account=this.account
+        promptAction.showToast({
+            message:"登录成功",
+            duration:2000
+        })
+        router.replaceUrl({
+            url:'pages/Index'
+        })
 
     }
 }

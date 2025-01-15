@@ -1,6 +1,6 @@
 import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
-
+import http from '@ohos.net.http';
 @Entry
 @Component
 struct RegisterPage{
@@ -40,13 +40,6 @@ struct RegisterPage{
             })
             return
           }
-          if(this.account=='abc'){
-            promptAction.showToast({
-              message:'已存在该账号',
-              duration:2000
-            })
-            return
-          }
           if(this.password1===''){
             promptAction.showToast({
               message:'密码不能为空',
@@ -56,15 +49,41 @@ struct RegisterPage{
           }
           if(this.password1!=this.password2){
             promptAction.showToast({
-              message:'请重新输入密码',
+              message:'两次输入密码不相同',
               duration:2000
             })
             return
           }
           //传递账号密码信息给数据库
-          router.replaceUrl({
-            url:'pages/Index'
+          const httpReq=http.createHttp()
+          const serve=httpReq.request('http://127.0.0.1:5000/api/sign',{
+            method:http.RequestMethod.POST,
+            header:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+              is_sign_up:true,
+              user_name:this.account,
+              password:this.password1
+            })
           })
+          serve.then(res=>{
+            if(res.result&&JSON.parse(res.result as string).code==-3){
+              promptAction.showToast({
+                message:'账号已存在',
+                duration:2000
+              })
+              return
+            }
+            if(res.result&&JSON.parse(res.result as string).code==200){
+              promptAction.showToast({
+                message:'注册成功，请返回登录界面',
+                duration:2000
+              })
+            }
+
+          })
+
         })
     }.border({width:1})
     .width("100%")
