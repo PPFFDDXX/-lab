@@ -8,17 +8,17 @@ HOSTNAME = "127.0.0.1"
 PORT = 3306
 USERNAME = "root"
 PASSWORD = "mysql123"
-DATABASE = "database"
+DATABASE = "harmony"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE}?charset=utf8mb4"
 
 db = SQLAlchemy(app)#读取app.config
 
 #连接测试代码
-#with app.app_context():
-#    with db.engine.connect() as conn:
-#        rs = conn.execute(text("SELECT 1;"))
-#        print(rs.fetchone())
+with app.app_context():
+    with db.engine.connect() as conn:
+        rs = conn.execute(text("SELECT 1;"))
+        print(rs.fetchone())
 
 class USER(db.Model):#固定写法
     __tabelname__ = "USER"
