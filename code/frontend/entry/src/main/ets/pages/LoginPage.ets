@@ -2,6 +2,7 @@ import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
 import http from '@ohos.net.http';
 import {ap} from '../common/trans';
+import axios from '@ohos/axios'
 @Entry
 @Component
 struct LauncherPage {
@@ -100,9 +101,9 @@ struct LauncherPage {
                 "Content-Type":"application/json"
             },
             extraData:JSON.stringify({
-                is_sign_up:false,
-                user_name:this.account,
-                password:this.password
+                'is_sign_up':false,
+                'user_name':this.account,
+                'password':this.password
             })
         })
         serve.then(res=>{

@@ -1,6 +1,12 @@
 import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
 import http from '@ohos.net.http';
+import axios, { AxiosResponse } from '@ohos/axios'
+interface user{
+  is_sign_up:boolean,
+  user_name:string,
+  password:string
+}
 @Entry
 @Component
 struct RegisterPage{
@@ -55,35 +61,57 @@ struct RegisterPage{
             return
           }
           //传递账号密码信息给数据库
-          const httpReq=http.createHttp()
-          const serve=httpReq.request('http://127.0.0.1:5000/api/sign',{
-            method:http.RequestMethod.POST,
-            header:{
-              "Content-Type":"application/json"
-            },
-            extraData:JSON.stringify({
-              is_sign_up:true,
-              user_name:this.account,
-              password:this.password1
-            })
-          })
-          serve.then(res=>{
-            if(res.result&&JSON.parse(res.result as string).code==-3){
+          // const httpReq=http.createHttp()
+          // const serve=httpReq.request('http://127.0.0.1:5000/api/sign',{
+          //   method:http.RequestMethod.POST,
+          //   header:{
+          //     "Content-Type":"application/json"
+          //   },
+          //   extraData:JSON.stringify({
+          //     'is_sign_up':true,
+          //     'user_name':this.account,
+          //     'password':this.password1
+          //   })
+          // })
+          // serve.then(res=>{
+          //   if(res.result&&JSON.parse(res.result as string).code==-3){
+          //     promptAction.showToast({
+          //       message:'账号已存在',
+          //       duration:2000
+          //     })
+          //     return
+          //   }
+          //   if(res.result&&JSON.parse(res.result as string).code==200){
+          //     promptAction.showToast({
+          //       message:'注册成功，请返回登录界面',
+          //       duration:2000
+          //     })
+          //   }
+          //
+          // })
+
+          axios.post<string,AxiosResponse<string>,user>('http://127.0.0.1:5000/api/sign',{
+            is_sign_up:true,
+            user_name:this.account,
+            password:this.password1
+          },{
+            headers:{'Content-Type':'application/json'},
+            transformRequest:(data:user)=>{
+              return JSON.stringify(data)
+            }
+          }).then((response:AxiosResponse)=>{
+            if(response.data==-3){
               promptAction.showToast({
-                message:'账号已存在',
-                duration:2000
+              message:'账号已存在',
+              duration:2000
               })
               return
             }
-            if(res.result&&JSON.parse(res.result as string).code==200){
-              promptAction.showToast({
-                message:'注册成功，请返回登录界面',
-                duration:2000
-              })
-            }
-
+            promptAction.showToast({
+                    message:'注册成功，请返回登录界面',
+                    duration:2000
+                  })
           })
-
         })
     }.border({width:1})
     .width("100%")
