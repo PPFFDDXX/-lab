@@ -131,7 +131,7 @@ export struct BillPage {
                         .fontColor(Color.Black)
                         .fontSize(12)
                 }
-                Text(billInfo.money.toString())
+                Text('+'+billInfo.money.toString())
                     .fontColor(Color.Black)
                     .fontSize(12)
                     .fontWeight(FontWeight.Bold)
