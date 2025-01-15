@@ -115,6 +115,7 @@ export struct ProfilePage{
     .onClick(()=>{
       let text:string='github.com/PPFFDDXX/Harmony-OS-lab'
       AlertDialog.show({
+        title: 'Please star our repository',
         message: text,
         autoCancel: true,
         cancel: () => { },
@@ -122,22 +123,17 @@ export struct ProfilePage{
         offset: { dx: 0, dy: -20 },
         primaryButton: {
           value: "复制",
-          fontColor: "#FFFFFF",
-          backgroundColor: "#1E90FF",
           action: () => {
-            // 一键复制到剪贴板功能
             const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'https://github.com/PPFFDDXX/Harmony-OS-lab');
             const systemPasteboard = pasteboard.getSystemPasteboard();
             systemPasteboard.setData(pasteboardData);
             promptAction.showToast({
-              message: "内容已复制"
+              message: "网址已复制"
             });
           }
         },
         secondaryButton: {
           value: "跳转",
-          fontColor: '#808080',
-          backgroundColor: "#D3D3D3",
           action: () => {
             try {
               let want:Want = {
