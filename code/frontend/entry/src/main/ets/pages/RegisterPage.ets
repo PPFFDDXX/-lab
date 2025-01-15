@@ -61,7 +61,7 @@ struct RegisterPage{
             header:{
               "Content-Type":"application/json"
             },
-            body:JSON.stringify({
+            extraData:JSON.stringify({
               is_sign_up:true,
               user_name:this.account,
               password:this.password1

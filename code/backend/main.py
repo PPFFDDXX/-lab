@@ -160,6 +160,7 @@ def detail_update():
 @app.route("/api/sign")
 def sign():
     #登陆处理
+    print("sign")
     json_data = request.get_json()
 
     is_sign_up = json_data["is_sign_up"]
@@ -167,15 +168,23 @@ def sign():
     password = json_data["password"]
 
     if is_sign_up:
-        user_add(user_name,password)
+        if user_query(user_name,password) == -2:
+            print("-3")
+            return -3
+        else:
+            user_add(user_name,password)
+            print("0")
+            return 0
     else:
         if user_query(user_name,password) == -2:
-            return "该用户不存在"
+            print("-2")
+            return -2
         elif user_query(user_name,password) == -1:
-            return "密码错误"
+            print("-1")
+            return -1
         else:
-            #todo 传递数据
-            return "登陆成功！"
+            print("0")
+            return 0
 
 @app.route("/api/get_data/<string:user_name>")
 def get_data(user_name):

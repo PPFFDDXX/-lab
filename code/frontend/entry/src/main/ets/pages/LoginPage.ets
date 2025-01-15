@@ -8,7 +8,7 @@ struct LauncherPage {
 
   @State account:string='';
   @State password:string='';
-    private countDownSeconds : number = 100  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
+    private countDownSeconds : number = 100000000  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
     onPageShow(): void {
         this.timeId = setInterval(() => {
@@ -99,7 +99,7 @@ struct LauncherPage {
             header:{
                 "Content-Type":"application/json"
             },
-            body:JSON.stringify({
+            extraData:JSON.stringify({
                 is_sign_up:false,
                 user_name:this.account,
                 password:this.password
