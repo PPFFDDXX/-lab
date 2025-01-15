@@ -1,10 +1,13 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
+import { pasteboard } from '@kit.BasicServicesKit';
+import { common } from '@kit.AbilityKit';
+import Want from '@ohos.app.ability.Want';
 import Router from '@system.router';
 
 @Component
 export struct ProfilePage{
-  @State in_dark_mode:boolean=false
+  @State
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: CustomDialogDemo({
       cancel: () => {
@@ -59,12 +62,13 @@ export struct ProfilePage{
       .backgroundBlurStyle(BlurStyle.Regular)
 
       Column({space:10}){
-        this.colorModeItemBuilder($r('app.media.ic_dark_mode'),'浅色模式','深色模式')
-
+        this.mineItemBuilder($r('app.media.ic_mine_team'),'开发团队','前端成员：aaa，bbb，ccc，ddd\n后端成员：aaa，bbb，ccc')
         Divider()
-        this.mineItemBuilder($r('app.media.ic_mine_update'),'检查更新','已是最新')
+        this.mineItemBuilder($r('app.media.ic_mine_update'),'检查更新','已是最新版本')
         Divider()
-        this.mineItemBuilder($r('app.media.ic_mine_about'), '关于', '没有关于')
+        this.dialogItemBuilder($r('app.media.ic_mine_github'),'github')
+        Divider()
+        this.mineItemBuilder($r('app.media.ic_mine_about'), '关于', 'V 1.14.514')
         Blank()
         if(1/*this.token*/){
           Button('退出登录')
@@ -91,12 +95,12 @@ export struct ProfilePage{
     .alignContent(Alignment.Top)
   }
   @Builder
-  colorModeItemBuilder(icon:Resource,title1:string,title2:string){
+  dialogItemBuilder(icon:Resource,title:string){
     Row({space:10}){
       Image(icon)
         .width(24)
         .height(24)
-      Text(this.in_dark_mode==true?title1:title2)
+      Text(title)
         .fontSize(16)
         .height(24)
         .fontWeight(FontWeight.Medium)
@@ -109,10 +113,47 @@ export struct ProfilePage{
     .width('100%')
     .height(40)
     .onClick(()=>{
-      if(this.in_dark_mode){
-        this.in_dark_mode=false
-      }
-      else{this.in_dark_mode=true}
+      let text:string='github.com/PPFFDDXX/Harmony-OS-lab'
+      AlertDialog.show({
+        message: text,
+        autoCancel: true,
+        cancel: () => { },
+        alignment: DialogAlignment.Bottom,
+        offset: { dx: 0, dy: -20 },
+        primaryButton: {
+          value: "复制",
+          fontColor: "#FFFFFF",
+          backgroundColor: "#1E90FF",
+          action: () => {
+            // 一键复制到剪贴板功能
+            const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'https://github.com/PPFFDDXX/Harmony-OS-lab');
+            const systemPasteboard = pasteboard.getSystemPasteboard();
+            systemPasteboard.setData(pasteboardData);
+            promptAction.showToast({
+              message: "内容已复制"
+            });
+          }
+        },
+        secondaryButton: {
+          value: "跳转",
+          fontColor: '#808080',
+          backgroundColor: "#D3D3D3",
+          action: () => {
+            try {
+              let want:Want = {
+                action: 'ohos.want.action.viewData',
+                entities: ['entity.system.browsable'],
+                uri: 'https://github.com/PPFFDDXX/Harmony-OS-lab'
+              }
+              let context = getContext(this) as common.UIAbilityContext;
+              context.startAbility(want)
+              console.info(`explicit start ability succeed`)
+            } catch (error) {
+              console.info(`explicit start ability failed with ${error.code}`)
+            }
+          }
+        }
+      });
     })
   }
   @Builder
@@ -130,6 +171,7 @@ export struct ProfilePage{
       Image($r('app.media.ic_arrow_right'))
         .width(24)
         .height(24)
+
     }
     .width('100%')
     .height(40)
@@ -149,7 +191,7 @@ struct CustomDialogDemo {
 
   build() {
     Column({ space: 20 }) {
-      Text('是否退出')
+      Text('确定退出')
         .fontSize(20)
       Flex({ justifyContent: FlexAlign.SpaceAround }) {
         Button('取消')
@@ -158,7 +200,7 @@ struct CustomDialogDemo {
               this.controller.close()
               this.cancel()
             }
-          }).backgroundColor(0xffffff).fontColor(Color.Black)
+          }).backgroundColor('#D3D3D3').fontColor(Color.Black).width(130)
         /*Divider().vertical(true).height(40).opacity(4).margin({ left: 0, right: 0 })*/
         Button('退出')
           .onClick(() => {
@@ -168,7 +210,7 @@ struct CustomDialogDemo {
               })
               this.controller.close()
             }
-          }).backgroundColor(Color.Red).fontColor(Color.White)
+          }).backgroundColor(Color.Red).fontColor(Color.White).width(130)
       }.margin({ bottom: 10 })
     }.borderRadius(10).padding({ top: 20 })
   }
