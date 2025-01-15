@@ -3,6 +3,7 @@
     "pages/Index",
     "pages/LoginPage",
     "pages/AddBalance",
-    "pages/BillInfos"
+    "pages/BillInfos",
+    "pages/RegisterPage"
   ]
 }

@@ -6,7 +6,7 @@ import { promptAction } from '@kit.ArkUI';
 struct LauncherPage {
   @State account:string='';
   @State password:string='';
-    private countDownSeconds : number = 1  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
+    private countDownSeconds : number = 100  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
     onPageShow(): void {
         this.timeId = setInterval(() => {
@@ -69,7 +69,9 @@ struct LauncherPage {
                 })
             Text('注册账号').fontColor(Color.Blue).fontSize(14)
                 .onClick(()=>{
-
+                    router.pushUrl({
+                        url:'pages/RegisterPage'
+                    })
                 })
             LoadingProgress().width(50).height(50).color(Color.Blue)
             Blank()
@@ -82,6 +84,7 @@ struct LauncherPage {
     }
     login(){
         //判断是否存在账号
+
         if(514==514){
             promptAction.showToast({
                 message:this.account,
@@ -99,6 +102,9 @@ struct LauncherPage {
             promptAction.showToast({
                 message:"登录成功",
                 duration:2000
+            })
+            router.replaceUrl({
+                url:'pages/Index'
             })
         }
         else{
