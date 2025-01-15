@@ -23,6 +23,14 @@
     {
       "name": "income",
       "value": "收入"
+    },
+    {
+      "name": "year",
+      "value": "年"
+    },
+    {
+      "name": "month",
+      "value": "月"
     }
   ]
 }

@@ -31,6 +31,10 @@
     {
       "name": "text_light_black",
       "value": "#2d3034"
+    },
+    {
+      "name": "text_gray",
+      "value": "#ff858585"
     }
   ]
 }
