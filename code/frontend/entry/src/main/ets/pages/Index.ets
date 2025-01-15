@@ -1,6 +1,6 @@
 import { TAB_INFO } from '../model/TabBarClass'
 import { TabBarClass } from '../model/TabBarClass'
-import {BillInfo,TempBills} from '../model/BillInfo'
+import {BillInfoType,TempBills} from '../model/BillInfoType'
 
 import { CustomTabBar } from '../components/CustomTabBar'
 import {BillPage} from '../components/BillPage'
@@ -13,7 +13,7 @@ struct Index {
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
 
-    @State billInfo: BillInfo[] = [];
+    @State billInfo: BillInfoType[] = [];
     private controller: TabsController = new TabsController();
 
     onPageHide(): void {

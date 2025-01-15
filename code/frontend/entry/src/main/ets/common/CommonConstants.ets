@@ -5,7 +5,6 @@
 
 export class CommonConstants {
 
-
-
+    static readonly NONE_ID:number = -1;
 
 }

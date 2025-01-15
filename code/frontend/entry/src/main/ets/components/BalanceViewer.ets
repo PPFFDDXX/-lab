@@ -1,4 +1,4 @@
-import { BillInfo } from '../model/BillInfo';
+import { BillInfoType } from '../model/BillInfoType';
 import { CalBill, SpliteBillsByDate } from '../util/DealBill';
 import { FormatDate } from '../util/DealTime'
 import { promptAction } from '@kit.ArkUI';
@@ -10,8 +10,8 @@ export struct BalanceViewer {
     @Link selectedDate: Date;
     @Link totalIncome: number;
     @Link totalBalance: number;
-    @Link billInfo: BillInfo[]
-    @Link BillsByDate: Map<string, BillInfo[]>
+    @Link billInfo: BillInfoType[]
+    @Link BillsByDate: Map<string, BillInfoType[]>
 
     UpdateTotalMoney():void {
         //UI更新当月总支出和总收入

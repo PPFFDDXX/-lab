@@ -1,17 +1,21 @@
-import { BillInfo } from '../model/BillInfo';
-import { CalExpense, CalLeft, isExpense, SpliteBillsByMon } from '../util/DealBill';
+import { BillInfoType } from '../model/BillInfoType';
+import { CalExpense, CalIncome, CalLeft, isExpense, SpliteBillsByMon } from '../util/DealBill';
+import { router } from '@kit.ArkUI';
 
 @Entry
 @Component
 struct BillInfos {
-    @Prop billInfo: BillInfo[] = [];
+    @State billInfo: BillInfoType[] = (router.getParams() as ESObject)['billInfo'];
     @State activeDate: Date = new Date();
     @State yearlyLeft: number = 0;
     @State yearlyExpense: number = 0;
     @State yearlyIncome: number = 0;
-    private BillsByMon: Map<number, BillInfo[]> = SpliteBillsByMon(this.billInfo, this.activeDate);
+    @State BillsByMon: Map<number, BillInfoType[]> = SpliteBillsByMon(this.billInfo, this.activeDate);
 
-    onPageShow(): void {
+    updateTotalNumber():void {
+        this.yearlyLeft = 0;
+        this.yearlyIncome = 0;
+        this.yearlyExpense = 0;
         this.BillsByMon.forEach((item) => {
             item.forEach((bill) => {
                 isExpense(bill) ? this.yearlyExpense += Math.abs(bill.money) : this.yearlyIncome += Math.abs(bill.money)
@@ -20,62 +24,148 @@ struct BillInfos {
         this.yearlyLeft = this.yearlyIncome - this.yearlyExpense;
     }
 
+    onPageShow(): void {
+        this.updateTotalNumber();
+    }
+
     build() {
         RelativeContainer() {
             Column() {
                 Row() {
-                    Text(`${this.activeDate.getFullYear()}`)
-                        .fontSize(16)
-                        .margin({ left: 16 })
-                    Text($r("app.string.year"))
-                        .fontSize(14)
-                    Image($r("app.media.ic_public_extract_list_dark"))
-                        .width(8)
-                        .height(8)
-                        .margin({ left: 8 })
-                }.onClick(() => {
-                    DatePickerDialog.show({
-                        start: new Date("2000-01"),
-                        onAccept: (v) => {
-                            this.activeDate.setFullYear(v.year, v.month, v.day);
-                        }
-                    })
-                })
+                    SymbolGlyph($r('sys.symbol.arrow_left'))
+                        .size({ height: 16, width: 16 })
+                        .onClick(() => {
+                            router.back();
+                        })
+                    Row() {
 
-
-                List() {
-                    ForEach(Array.from(this.BillsByMon.entries()), (item: [mon: number, bills: BillInfo[]]) => {
-                        ListItem() {
-                            GridRow({ columns: 4 }) {
-                                GridCol() {
-                                    Text(`${item[0]}月`).fontSize(16)
-                                }
-
-                                GridCol() {
-                                    Text(`${CalExpense(item[1])}`).fontSize(14)
-                                }
-
-                                GridCol() {
-                                    Text(`${CalExpense(item[1])}`).fontSize(14)
-                                }
-
-                                GridCol() {
-                                    Text(`${CalLeft(item[1])}`).fontSize(14)
-                                }
+                        Text(`${this.activeDate.getFullYear()}`)
+                            .fontSize(16)
+                            .margin({ left: 16 })
+                        Text($r("app.string.year"))
+                            .fontSize(14)
+                        Image($r("app.media.ic_public_extract_list_dark"))
+                            .width(8)
+                            .height(8)
+                            .margin({ left: 8 })
+                    }.onClick(() => {
+                        DatePickerDialog.show({
+                            start: new Date("2000-01"),
+                            onAccept: (v) => {
+                                this.activeDate.setFullYear(v.year, v.month, v.day);
+                                this.BillsByMon= SpliteBillsByMon(this.billInfo, this.activeDate);
+                                this.updateTotalNumber();
                             }
-                            .padding(12)
-                            .border({
-                                width: { top: 0.5 },
-                                color: $r("app.color.text_gray")
-                            })
-                            .width('100%')
+                        })
+                    })
+
+                }
+                .height(36)
+                .margin(16)
+                .width('90%')
+                .justifyContent(FlexAlign.SpaceBetween)
+
+                Row() {
+                    Column() {
+                        Row(){
+                            Text("年结余").fontSize(14).fontColor('#ffffff').margin(4).height(22)
                         }
+                        .width('100%')
+                        .justifyContent(FlexAlign.Start)
+                        Row(){
+                            Text(`${this.yearlyLeft}`).fontSize(28).fontColor('#ffffff').margin(4).height(36)
+                        }
+                        .width('100%')
+                        .justifyContent(FlexAlign.Start)
+
+                        Row() {
+                            Text(`年收入 ${this.yearlyIncome}`)
+                                .fontColor('#ffffff')
+                                .fontSize(14)
+                                .height(30)
+                            Blank()
+                                .width('40%')
+                            Text(`年支出 ${this.yearlyExpense}`)
+                                .fontColor('#ffffff')
+                                .fontSize(14)
+                                .height(30)
+                        }
+                        .justifyContent(FlexAlign.Start)
+                        .width('100%')
+                    }
+                    .padding({
+                        left: 24,
+                        right: 24,
+                        top: 16,
+                        bottom: 16
                     })
                 }
-            }
+                .height(132)
+                .backgroundColor($r("app.color.main_theme_blue"))
+                .margin({ left: 16, right: 16 })
+                .borderRadius(12)
+                .shadow({ radius: 12, color: $r('app.color.main_theme_shadow') })
 
+                Row() {
+                    Column() {
+                        GridRow({ columns: 4 }) {
+                            GridCol() {
+                                Text("月份").fontSize(12).fontColor($r("app.color.text_gray"))
+                            }
+
+                            GridCol() {
+                                Text("月收入").fontSize(12).fontColor($r("app.color.text_gray"))
+                            }
+
+                            GridCol() {
+                                Text("月支出").fontSize(12).fontColor($r("app.color.text_gray"))
+                            }
+
+                            GridCol() {
+                                Text("月结余").fontSize(12).fontColor($r("app.color.text_gray"))
+                            }
+                        }
+                        .width('100%')
+                        .margin({ bottom: 8 })
+
+                        Row() {
+                            List() {
+                                ForEach(Array.from(this.BillsByMon.entries()),
+                                    (item: [mon: number, bills: BillInfoType[]]) => {
+                                        ListItem() {
+                                            GridRow({ columns: 4 }) {
+                                                GridCol() {
+                                                    Text(`${item[0]}月`).fontSize(16)
+                                                }
+
+                                                GridCol() {
+                                                    Text(`${CalIncome(item[1])}`).fontSize(14)
+                                                }
+
+                                                GridCol() {
+                                                    Text(`${CalExpense(item[1])}`).fontSize(14)
+                                                }
+
+                                                GridCol() {
+                                                    Text(`${CalLeft(item[1])}`).fontSize(14)
+                                                }
+                                            }
+                                            .padding(12)
+                                            .border({
+                                                width: { top: 0.5 },
+                                                color: $r("app.color.text_gray")
+                                            })
+                                            .width('100%')
+                                        }
+                                    })
+                            }.listDirection(Axis.Vertical)
+                        }
+                        .width('100%')
+                    }
+                }
+                .padding(16)
+                .width('100%')
+            }
         }
-        .height('100%')
-        .width('100%')
     }
 }

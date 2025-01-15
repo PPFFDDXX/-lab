@@ -1,8 +1,9 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import { defaultExpenseType, defaultIncomeType, IBillType } from '../model/BillType';
+import { defaultType, IBillType } from '../model/BillType';
 import { promptAction } from '@kit.ArkUI';
-import { BillInfo } from '../model/BillInfo';
+import { BillInfoType } from '../model/BillInfoType';
+import { formatDateToYMD } from '../util/DealTime';
 
 interface IKeyboardUnit {
     content: string | Resource,
@@ -12,6 +13,8 @@ interface IKeyboardUnit {
     foreColor?: ResourceColor
 }
 
+
+
 enum calculateAction {
     start,
     input,
@@ -19,25 +22,35 @@ enum calculateAction {
     cal
 }
 
+
+
 @Entry
 @Component
 struct AddBalance {
-    @State activeTab: number = 0;
-    activeType: Resource = $r("app.media.salaryIcon");
-    @State selectedTypeName: string = '';
-    @State balanceAmount: string = "0.00";
-    @State calOp: string = "";
-    @State content: string = "";
-    @State calculateAction: calculateAction = calculateAction.start;
-    @State doneButtonText: string = "√";
+
     @State activeYear: number = (router.getParams() as ESObject)['year'];
     @State activeMonth: number = (router.getParams() as ESObject)['month'];
+    @State isUpdate: boolean = (router.getParams() as ESObject)['isUpdate'];  //判断当前是update还是 add
+    @State updateBillInfo: BillInfoType = (this.isUpdate)?(router.getParams() as ESObject)['updateBillInfo']:undefined;  // 要update的bill的信息
+
+
+    @State activeTab: number = (this.isUpdate)?(this.updateBillInfo.type > 17 ? 1: 0): 0;
+    activeType: Resource = $r("app.media.salaryIcon");
+
+    @State selectedTypeName: string =(this.isUpdate)?(defaultType[this.updateBillInfo.type].title): '';
+    @State balanceAmount: string = (this.isUpdate)?(this.updateBillInfo.money.toFixed(2)):"0.00";
+    @State calOp: string = "";
+    @State content: string = (this.isUpdate)?this.updateBillInfo.content:"";
+    @State calculateAction: calculateAction =(this.isUpdate)?calculateAction.input: calculateAction.start;
+    @State doneButtonText: string = "√";
+
+
     @State activeDay: number = new Date().getDate();
     activeDate: Date = new Date();
     context = getContext(this) as common.UIAbilityContext;
     filesDir = this.context.filesDir;
-    @State inputMarginTop: number = 1000; //输入控件的上外边距
-    @State inputOpacity: number = 0; //输入控件的透明度
+    @State inputMarginTop: number = (this.isUpdate)?0:1000; //输入控件的上外边距
+    @State inputOpacity: number = (this.isUpdate)?1:0; //输入控件的透明度
 
     ChangeUnit(number: string): void {
         if (this.balanceAmount == "0.00") {
@@ -62,7 +75,13 @@ struct AddBalance {
         this.content = '';
     }
 
-    cost_data(billInfo:BillInfo) {
+    AddBill(userName: string,
+        type: number,
+        money: number,
+        content: string,
+        date: string) {
+
+        //这里调用add_data
         promptAction.showToast({
             message: "上传成功！",
             duration: 2000
@@ -70,7 +89,6 @@ struct AddBalance {
         this.ClearInput()
         this.inputMarginTop = 1000;
         this.inputOpacity = 0;
-        // 这里调用cost函数
     }
 
     balanceInputUnits: IKeyboardUnit[] =
@@ -231,7 +249,7 @@ struct AddBalance {
                     if (this.balanceAmount == "0") {
                         return;
                     }
-                    this.balanceAmount += "0";
+                    this.ChangeUnit("0")
                 }
             },
             {
@@ -295,7 +313,12 @@ struct AddBalance {
                         })
                         return;
                     }
-                    this.cost_data(new BillInfo("test",1,parseFloat(this.balanceAmount),this.content,""))
+                    if(this.isUpdate){
+                        //update Bill
+                    }
+                    else{
+                        this.AddBill("test",1,parseFloat(this.balanceAmount),this.content,formatDateToYMD(this.activeDate))
+                    }
                 }
             }
         ];
@@ -373,7 +396,7 @@ struct AddBalance {
                 .width('100%')
 
                 GridRow({ columns: 4, gutter: 12 }) {
-                    ForEach(this.activeTab == 0 ? defaultExpenseType : defaultIncomeType, (item: IBillType) => {
+                    ForEach(this.activeTab == 0 ? defaultType.slice(0,18) : defaultType.slice(18,23), (item: IBillType) => {
                         GridCol() {
                             Column({ space: 4 }) {
                                 Row() {
@@ -427,7 +450,7 @@ struct AddBalance {
                 }.height(36)
 
                 Row() {
-                    TextInput({ placeholder: "点击填写备注" })
+                    TextInput({ placeholder: (this.isUpdate)?this.updateBillInfo.content:"点击填写备注" })
                         .margin(16)
                         .borderRadius(8)
                         .onChange((v) => {

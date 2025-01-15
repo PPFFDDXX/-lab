@@ -42,6 +42,16 @@ export function Translate(date:string):Date {
     return new Date(date)
 }
 
+/*
+* 这是一个将Date类型date转换成字符串的函数
+ */
+export function formatDateToYMD(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 
 /*
 * 这是一个获取并格式处理年月的函数

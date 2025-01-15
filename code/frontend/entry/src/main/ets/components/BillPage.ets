@@ -1,25 +1,49 @@
 import { FunctionSelect } from './FunctionSelect'
 import { BalanceViewer } from './BalanceViewer'
-import { BillInfo } from '../model/BillInfo'
+import { BillInfoType } from '../model/BillInfoType'
 
-import { defaultExpenseType, defaultIncomeType } from '../model/BillType'
+import { defaultType} from '../model/BillType'
 
 import { isExpense, SpliteBillsByDate } from '../util/DealBill'
+
+import { promptAction, router } from '@kit.ArkUI';
+import { CommonConstants } from '../common/CommonConstants'
+
 
 @Component
 export struct BillPage {
     @State selectedDate: Date = new Date();
     @State totalIncome: number = 0;
     @State totalBalance: number = 0;
-    @Link billInfo: BillInfo[]
-    @State BillsByDate: Map<string, BillInfo[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
+    @Link billInfo: BillInfoType[]
+    @State BillsByDate: Map<string, BillInfoType[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
 
     // onPageShow(): void {
     //     this.totalIncome = 4;
     //     this.totalBalance = 4;
     // }
     aboutToAppear(): void {
-        const BillsByDate: Map<string, BillInfo[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
+        const BillsByDate: Map<string, BillInfoType[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
+    }
+
+    deleteBill(bill:BillInfoType){
+        const index = this.billInfo.indexOf(bill);
+        if (index > -1) {
+            this.billInfo.splice(index, 1);
+            this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
+
+            //todo:这里调用delete_data(Object O)
+
+            promptAction.showToast({
+                'message':"删除成功",
+                'duration':2000
+            })
+        } else {
+            promptAction.showToast({
+                'message':"删除失败!",
+                'duration':2000
+            })
+        }
     }
 
     build() {
@@ -49,7 +73,8 @@ export struct BillPage {
             .backgroundColor(Color.White)
 
             FunctionSelect({
-                selectedDate: $selectedDate
+                selectedDate: $selectedDate,
+                billInfo: $billInfo
             })
 
             if (this.billInfo.length == 0 || this.BillsByDate.size == 0) {
@@ -71,7 +96,7 @@ export struct BillPage {
 
             } else {
                 List() {
-                    ForEach(Array.from(this.BillsByDate.entries()), (item: [date: string, bills: BillInfo[]]) => {
+                    ForEach(Array.from(this.BillsByDate.entries()), (item: [date: string, bills: BillInfoType[]]) => {
                         ListItem() {
                             // 日期标题
                             Column() {
@@ -102,17 +127,17 @@ export struct BillPage {
     }
 
     @Builder
-    BillItem(billInfo: BillInfo) {
-        if (isExpense(billInfo)) {
+    BillItem(billInfo: BillInfoType) {
+
             Row() {
                 Row({space:12}) {
-                    Image(defaultExpenseType[billInfo.type].img)
+                    Image(defaultType[billInfo.type].img)
                         .padding(8)
                         .size({ height: 32, width: 32 })
-                    Text(defaultExpenseType[billInfo.type].title)
+                    Text(defaultType[billInfo.type].title)
                         .fontSize(12)
                 }
-                Text(billInfo.money.toString())
+                Text((isExpense(billInfo)?'-':'')+billInfo.money.toString())
                     .fontColor(Color.Black)
                     .fontSize(12)
                     .fontWeight(FontWeight.Bold)
@@ -120,35 +145,87 @@ export struct BillPage {
             .margin({left:16,right:16})
             .width('90%')
             .justifyContent(FlexAlign.SpaceBetween)
-        }
-        else {
-            Row() {
-                Row({space:12}) {
-                    Image(defaultIncomeType[billInfo.type].img)
-                        .padding(8)
-                        .size({ height: 32, width: 32 })
-                    Text(defaultIncomeType[billInfo.type].title)
-                        .fontColor(Color.Black)
-                        .fontSize(12)
-                }
-                Text('+'+billInfo.money.toString())
-                    .fontColor(Color.Black)
-                    .fontSize(12)
-                    .fontWeight(FontWeight.Bold)
+            .gesture(LongPressGesture({ repeat: true })
+                // 这里是长按调用
+                .onActionEnd((event: GestureEvent) => {
+                    ActionSheet.show({
 
-            }
-            .margin({left:16,right:16})
-            .width('90%')
-            .justifyContent(FlexAlign.SpaceBetween)
-        }
-
+                        title: '',
+                        message: '',
+                        autoCancel: true,
+                        showInSubWindow: true,
+                        isModal: true,
+                        width: '40%',
+                        height: '15%',
+                        cornerRadius: 20,
+                        borderWidth: 1,
+                        borderStyle: BorderStyle.Solid,
+                        backgroundColor: Color.White,
+                        shadow: ({ radius: 20, color: Color.Grey, offsetX: 50, offsetY: 0}),
+                        transition:TransitionEffect.asymmetric(TransitionEffect.OPACITY
+                            .animation({ duration: 500, curve: Curve.Sharp }).combine(TransitionEffect.scale({x: 1.5, y: 1.5}).animation({duration: 400, curve: Curve.Sharp})),
+                            TransitionEffect.OPACITY.animation({ duration: 100, curve: Curve.Smooth })
+                                .combine(TransitionEffect.scale({x: 0.5, y: 0.5}).animation({duration: 100, curve: Curve.Smooth}))),
+                        // confirm: {
+                        //     defaultFocus: true,
+                        //     value: 'Confirm button',
+                        //     action: () => {
+                        //         console.log('Get Alert Dialog handled')
+                        //     }
+                        // },
+                        cancel: () => {
+                            console.log('actionSheet canceled')
+                        },
+                        onWillDismiss:(dismissDialogAction: DismissDialogAction)=> {
+                            console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
+                            console.log("dialog onWillDismiss")
+                            if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+                                dismissDialogAction.dismiss()
+                            }
+                            if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+                                dismissDialogAction.dismiss()
+                            }
+                        },
+                        alignment: DialogAlignment.Center,
+                        offset: { dx: 0, dy: -10 },
+                        sheets: [
+                            {
+                                title: '删除',
+                                action: () => {
+                                    this.deleteBill(billInfo)
+                                }
+                            },
+                            {
+                                title: '修改',
+                                action: () => {
+                                    router.pushUrl({
+                                        url: "pages/AddBalance",
+                                        params: {
+                                            year: this.selectedDate.getFullYear(),
+                                            month: this.selectedDate.getMonth() + 1,
+                                            isUpdate: true,
+                                            updateBillInfo:billInfo
+                                        }
+                                    })
+                                }
+                            },
+                            {
+                                title: '查看明细',
+                                action: () => {
+                                    console.log('pears')
+                                }
+                            }
+                        ]
+                    })
+                })
+            )
     }
 
     @Builder
-    BillDateList(billInfoarray: BillInfo[]) {
+    BillDateList(billInfoarray: BillInfoType[]) {
 
         List({ space: 2 }) {
-            ForEach(billInfoarray, (item: BillInfo) => {
+            ForEach(billInfoarray, (item: BillInfoType) => {
                 ListItem() {
                     this.BillItem(item)
                 }
@@ -158,4 +235,6 @@ export struct BillPage {
         .borderColor(Color.White)
 
     }
+
+
 }

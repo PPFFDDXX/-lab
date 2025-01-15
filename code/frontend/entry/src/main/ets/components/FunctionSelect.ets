@@ -1,10 +1,13 @@
 
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
+import { BillInfoType } from '../model/BillInfoType';
+import { CommonConstants } from '../common/CommonConstants';
 
 @Component
 export struct FunctionSelect {
     @Link selectedDate: Date;
+    @Link billInfo: BillInfoType[];
 
     build() {
         Row() {
@@ -26,9 +29,10 @@ export struct FunctionSelect {
                     }.width(48)
                 }.backgroundColor(Color.Transparent).borderRadius(8).onClick(() => {
                     router.pushUrl({
-                        url: "pages/BillInfoPage",
+                        url: "pages/BillInfos",
                         params: {
-                            date: this.selectedDate
+                            date: this.selectedDate,
+                            billInfo:this.billInfo
                         }
                     });
                 })
@@ -95,7 +99,9 @@ export struct FunctionSelect {
                         url: "pages/AddBalance",
                         params: {
                             year: this.selectedDate.getFullYear(),
-                            month: this.selectedDate.getMonth() + 1
+                            month: this.selectedDate.getMonth() + 1,
+                            isUpdate: false,
+                            updateBillInfo:undefined
                         }
                     })
                 }).borderRadius(8)
