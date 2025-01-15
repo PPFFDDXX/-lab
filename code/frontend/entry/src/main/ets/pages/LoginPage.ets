@@ -6,7 +6,7 @@ import { promptAction } from '@kit.ArkUI';
 struct LauncherPage {
   @State account:string='';
   @State password:string='';
-    private countDownSeconds : number = 300  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
+    private countDownSeconds : number = 1  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
     onPageShow(): void {
         this.timeId = setInterval(() => {

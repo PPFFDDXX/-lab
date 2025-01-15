@@ -2,6 +2,7 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import { defaultExpenseType, defaultIncomeType, IBillType } from '../model/BillType';
 import { promptAction } from '@kit.ArkUI';
+import { BillInfo } from '../model/BillInfo';
 
 interface IKeyboardUnit {
     content: string | Resource,
@@ -38,7 +39,7 @@ struct AddBalance {
     @State inputMarginTop: number = 1000; //输入控件的上外边距
     @State inputOpacity: number = 0; //输入控件的透明度
 
-    CaangeUnit(number: string): void {
+    ChangeUnit(number: string): void {
         if (this.balanceAmount == "0.00") {
             this.balanceAmount = number;
         } else {
@@ -58,14 +59,17 @@ struct AddBalance {
         this.balanceAmount = '0.00';
         this.calculateAction = calculateAction.start;
         this.calOp = '';
+        this.content = '';
     }
 
-    cost_data() {
+    cost_data(billInfo:BillInfo) {
         promptAction.showToast({
             message: "上传成功！",
             duration: 2000
         })
         this.ClearInput()
+        this.inputMarginTop = 1000;
+        this.inputOpacity = 0;
         // 这里调用cost函数
     }
 
@@ -74,19 +78,19 @@ struct AddBalance {
             {
                 content: "7",
                 callback: () => {
-                    this.CaangeUnit("7")
+                    this.ChangeUnit("7")
                 }
             },
             {
                 content: "8",
                 callback: () => {
-                    this.CaangeUnit("8")
+                    this.ChangeUnit("8")
                 }
             },
             {
                 content: "9",
                 callback: () => {
-                    this.CaangeUnit("9")
+                    this.ChangeUnit("9")
                 }
             },
             {
@@ -106,19 +110,19 @@ struct AddBalance {
             {
                 content: "4",
                 callback: () => {
-                    this.CaangeUnit("4")
+                    this.ChangeUnit("4")
                 }
             },
             {
                 content: "5",
                 callback: () => {
-                    this.CaangeUnit("5")
+                    this.ChangeUnit("5")
                 }
             },
             {
                 content: "6",
                 callback: () => {
-                    this.CaangeUnit("6")
+                    this.ChangeUnit("6")
                 }
             },
             {
@@ -162,19 +166,19 @@ struct AddBalance {
             {
                 content: "1",
                 callback: () => {
-                    this.CaangeUnit("1")
+                    this.ChangeUnit("1")
                 }
             },
             {
                 content: "2",
                 callback: () => {
-                    this.CaangeUnit("2")
+                    this.ChangeUnit("2")
                 }
             },
             {
                 content: "3",
                 callback: () => {
-                    this.CaangeUnit("3")
+                    this.ChangeUnit("3")
                 }
             },
             {
@@ -291,7 +295,7 @@ struct AddBalance {
                         })
                         return;
                     }
-                    this.cost_data()
+                    this.cost_data(new BillInfo("test",1,parseFloat(this.balanceAmount),this.content,""))
                 }
             }
         ];
@@ -356,6 +360,12 @@ struct AddBalance {
                         })
                         .textAlign(TextAlign.End)
                         .margin({ right: 24 })
+                        .onClick(()=>{
+                            animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
+                                this.inputMarginTop = 1000;
+                                this.inputOpacity = 0;
+                            })
+                        })
                 }
                 .justifyContent(FlexAlign.SpaceBetween)
                 .height(48)

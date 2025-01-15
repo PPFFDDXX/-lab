@@ -45,6 +45,40 @@ export function SpliteBillsByDate(billinfos: BillInfo[], selectedDate: Date): Ma
 }
 
 
+/*
+* 这是一个将账单信息数组转换为map<mon:number,账单信息[]>的函数
+* 用处是在账单界面的UI展示
+ */
+
+export function SpliteBillsByMon(billinfos: BillInfo[], selectedDate: Date): Map<number, BillInfo[]> {
+    const groupedBills: Map<number, BillInfo[]> = new Map();
+
+    const selectedMon: number = selectedDate.getMonth() + 1;
+    const selectedYear: number = selectedDate.getFullYear();
+
+    billinfos.forEach(bill => {
+        const date = bill.date; //  date 是字符串，格式为 'YYYY-MM-DD'
+        const month = new Date(date).getMonth() + 1;
+        const year = new Date(date).getFullYear();
+
+        if (year == selectedYear  && !groupedBills.has(month) ) {
+            groupedBills.set(month, []);
+        }
+        if (groupedBills.has(month)) {
+            groupedBills.get(month)!.push(bill);
+        } else {
+            console.error(`Date ${month} was not initialized correctly.`);
+        }
+    });
+
+    return groupedBills;
+}
+
+
+/*
+* 这是一个计算当月支出和收入的函数
+ */
+
 export function CalBill(BillsByDate:Map<string, BillInfo[]>):[ number,number ]{
     let totalExpense : number = 0;
     let totalIncome : number = 0;
@@ -61,4 +95,28 @@ export function CalBill(BillsByDate:Map<string, BillInfo[]>):[ number,number ]{
     })
 
     return [totalExpense,totalIncome];
+}
+
+export function CalExpense(BillInfos:BillInfo[]):number {
+    let totalExpense = 0;
+    BillInfos.forEach((bill)=>{
+        if(isExpense(bill)) totalExpense += Math.abs(bill.money);
+    })
+    return totalExpense;
+}
+
+export function CalIncome(BillInfos:BillInfo[]):number {
+    let totalExpense = 0;
+    BillInfos.forEach((bill)=>{
+        if(!isExpense(bill)) totalExpense += Math.abs(bill.money);
+    })
+    return totalExpense;
+}
+
+export function CalLeft(BillInfos:BillInfo[]):number {
+    let totalLeft = 0;
+    BillInfos.forEach((bill)=>{
+        (isExpense(bill))? totalLeft += Math.abs(bill.money):totalLeft -= Math.abs(bill.money);
+    })
+    return totalLeft;
 }

@@ -24,6 +24,7 @@ struct Index {
     }
     onPageShow(): void {
         //这里调用函数获取数据吗?还是在登录界面实现
+        //应该是的，这里每次调用接口来获取更新后的数据
         this.billInfo = TempBills;
     }
 
