@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, text
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -37,12 +38,25 @@ class DETAIL(db.Model):
     bill_type = db.Column(db.Integer, nullable = False)
     money = db.Column(db.Float, nullable = False)
     content = db.Column(db.String(200))
-    date = db.Column(db.Date, nullable = False)
+    date = db.Column(db.String(100), nullable = False)
     
 
 with app.app_context():#获取上下文
     db.create_all()
 
+@app.route("/test")
+def test():
+    new_one = DETAIL(user_name = "hxy", bill_type = 0, money = 100000000, content = "", date = "2025-01-15")
+    db.session.add(new_one)
+    new_one = DETAIL(user_name = "hxy", bill_type = 1, money = 10000, content = "hehe", date = "2025-01-14")
+    db.session.add(new_one)
+    new_one = DETAIL(user_name = "hxy", bill_type = 0, money = 10, content = "pc", date = "2025-01-16")
+    db.session.add(new_one)
+    new_one = DETAIL(user_name = "zbc", bill_type = 0, money = 100, content = "hxy", date = "2025-01-15")
+    db.session.add(new_one)
+    db.session.commit()
+
+    return "200"
 
 # @app.route('/api/user/add')
 def user_add(user_name, password):
@@ -51,7 +65,7 @@ def user_add(user_name, password):
     db.session.add(new_one)
     db.session.commit()
 
-    return 200
+    return "200"
 
 # @app.route('/api/user/query')
 def user_query(user_name, password):
@@ -93,7 +107,7 @@ def user_update():
     user.password = password
     db.session.commit()
 
-    return 200
+    return "200"
 
 @app.route("/api/add")
 def detail_add():
@@ -110,17 +124,18 @@ def detail_add():
     db.session.add(new_one)
     db.session.commit()
 
-    return 200
+    return "200"
 
 @app.route("/api/delete")
 def detail_delete():
     #删除某条数据
     json_data = request.get_json()
     id = json_data["id"]
-    with db.engine.connect() as conn:
-        rs = conn.execute(text(f"delete from detail where id = {id}"))
     
-    return 200
+    detail = DETAIL.query.filter_by(id = id).first()
+    db.session.delete(detail)
+    db.session.commit()
+    return "200"
 
 @app.route("/api/update")
 def detail_update():
@@ -140,15 +155,17 @@ def detail_update():
     detail.date = date
     db.session.commit()
 
-    return 200
+    return "200"
 
 @app.route("/api/sign")
 def sign():
     #登陆处理
     json_data = request.get_json()
+
     is_sign_up = json_data["is_sign_up"]
     user_name = json_data["user_name"]
     password = json_data["password"]
+
     if is_sign_up:
         user_add(user_name,password)
     else:
@@ -165,21 +182,26 @@ def get_data(user_name):
     #前端获取数据
     details = DETAIL.query.filter_by(user_name = user_name)
     
+    json = {}
+    json["status"] = 200
+    
     datas = []
     for detail in details:
         data = {}
 
-        data["user_name"] = detail["user_name"]
-        data["id"] = detail["id"]
-        data["type"] = detail["bill_type"]
-        data["money"] = detail["money"]
-        data["content"] = detail["content"]
-        data["date"] = detail["date"]
+        data["user_name"] = detail.user_name
+        data["id"] = detail.id
+        data["type"] = detail.bill_type
+        data["money"] = detail.money
+        data["content"] = detail.content
+        data["date"] = datetime.strftime(detail.date, "%Y-%m-%d")
 
         datas.append(data)
 
-    return 200, jsonify(datas)
-    
+    json["datas"] = datas
+
+    return jsonify(json)
+
 # status, data = get_data(user_name)
 
 if __name__ == "__main__":
