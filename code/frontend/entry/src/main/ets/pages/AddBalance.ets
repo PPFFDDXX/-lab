@@ -450,7 +450,8 @@ struct AddBalance {
                 }.height(36)
 
                 Row() {
-                    TextInput({ placeholder: (this.isUpdate)?this.updateBillInfo.content:"点击填写备注" })
+                    TextInput({ placeholder: (this.isUpdate)?"":"点击填写备注",text:(this.isUpdate)?this.updateBillInfo.content:"" })
+
                         .margin(16)
                         .borderRadius(8)
                         .onChange((v) => {

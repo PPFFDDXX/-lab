@@ -1,3 +1,4 @@
+import { CommonConstants } from '../common/CommonConstants';
 import { TabBarClass } from '../model/TabBarClass'
 
 /*
@@ -11,9 +12,11 @@ export struct CustomTabBar {
     // 父组件传递的参数
     @Link selectedIndex: number;
     tabsInfo: TabBarClass[] = [];
+    @State iconOffset: number = 0;
+    @Link currentBreakpoint: string;
 
     build() {
-        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceAround, alignItems: ItemAlign.Center }) {
+        Flex({ direction: (this.currentBreakpoint == 'lg')?FlexDirection.Column:FlexDirection.Row, justifyContent: FlexAlign.SpaceAround, alignItems: ItemAlign.Center }) {
             // 数据量比较少的情况下推荐使用ForEach，遇到数据量比较多的场景，如列表场景、瀑布流场景等，推荐使用LazyForEach(https://developer.huawei.com/consumer/cn/doc/harmonyos-references-V5/ts-rendering-control-lazyforeach-V5)
             ForEach(this.tabsInfo, (item: TabBarClass, tabBarIndex: number) => {
                 // 单独一个TabBar组件
@@ -39,17 +42,17 @@ export struct CustomTabBar {
                             width: $r('app.float.custom_tab_image_size'),
                             height: $r('app.float.custom_tab_image_size')
                         }) // TODO：知识点：通过offset控制图片的纵向偏移。
-                    // .offset({
-                    //     y: (this.selectedIndex === tabBarIndex &&
-                    //         this.selectedIndex !== CommonConstants.COMMUNITY_TAB_BAR_INDEX) ?
-                    //     this.iconOffset : $r('app.integer.custom_tab_common_size_0')
-                    // })// TODO：知识点：组件的某些通用属性变化时，可以通过属性动画animation实现过渡效果。本示例的动画效果是tabBar的图片向上偏移一小段距离
-                    // .animation({
-                    //     duration: CommonConstants.CUSTOM_ANIMATION_DURATION,
-                    //     curve: Curve.Ease,
-                    //     iterations: CommonConstants.CUSTOM_ANIMATION_ITERATIONS,
-                    //     playMode: PlayMode.Normal
-                    // })
+                    .offset({
+                        y: (this.selectedIndex === tabBarIndex &&
+                            this.selectedIndex !== CommonConstants.COMMUNITY_TAB_BAR_INDEX) ?
+                        this.iconOffset : 0
+                    })// TODO：知识点：组件的某些通用属性变化时，可以通过属性动画animation实现过渡效果。本示例的动画效果是tabBar的图片向上偏移一小段距离
+                    .animation({
+                        duration: CommonConstants.CUSTOM_ANIMATION_DURATION,
+                        curve: Curve.Ease,
+                        iterations: CommonConstants.CUSTOM_ANIMATION_ITERATIONS,
+                        playMode: PlayMode.Normal
+                    })
                     Text(this.tabsInfo[tabBarIndex].text)
                         .fontSize($r('app.float.custom_tab_text_font_size'))
                         .fontWeight(FontWeight.Normal)
@@ -68,6 +71,7 @@ export struct CustomTabBar {
                 // 更新被选中的tabBar下标
                 this.selectedIndex = tabBarIndex;
                 // 此处控制tabBar的Image图片向上偏移
+                this.iconOffset = -3;
             })
         }
 

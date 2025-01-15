@@ -5,6 +5,20 @@ import {ProfilePage} from '../pages/ProfilePage'
 import { CustomTabBar } from '../components/CustomTabBar'
 import {BillPage} from '../components/BillPage'
 
+import mediaquery from '@ohos.mediaquery';
+
+let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
+
+
+function onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean) {
+        // do something here
+    } else {
+        // do something here
+    }
+}
+
+listener.on('change', onPortrait);
 @Entry
 @Component
 struct Index {
@@ -15,11 +29,42 @@ struct Index {
 
     @State billInfo: BillInfoType[] = [];
     private controller: TabsController = new TabsController();
+    @State currentBreakpoint: string = 'md';
+    private xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)');
+    private smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)');
+    private mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)');
+    private lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)');
+
+    registerBreakpoint(){
+        if (this.xsListener.matches) {
+            this.updateCurrentBreakpoint('xs')
+        }
+
+        if (this.smListener.matches) {
+            this.updateCurrentBreakpoint('sm')
+        }
+
+        if (this.mdListener.matches) {
+            this.updateCurrentBreakpoint('md')
+        }
+
+        if (this.lgListener.matches) {
+            this.updateCurrentBreakpoint('lg')
+        }
+
+    }
+
+    updateCurrentBreakpoint(breakpoint: string) {
+        if (this.currentBreakpoint !== breakpoint) {
+            this.currentBreakpoint = breakpoint;
+        }
+    }
 
     onPageHide(): void {
     }
     aboutToAppear(): void {
         this.billInfo = TempBills;
+        this.registerBreakpoint()
 
     }
     onPageShow(): void {
@@ -29,44 +74,32 @@ struct Index {
     }
 
     build() {
-        Column() {
-            Tabs({
-                index: this.selectedIndex,
-                barPosition: BarPosition.End,
-                controller: this.controller
-            }) {
-                // 将 this.selectedIndex 赋给 index
-                TabContent() {
-                    Text("首页")
-                }
-                .backgroundColor(Color.White)
-                .height('100%')
 
-                TabContent() {
-                    //ProfilePage()
-                    //HomePage()
-                    BillPage({
-                        billInfo:$billInfo
-                    })
-                        .height('100%')
-                }
 
-                TabContent() {
-                    ProfilePage()
-                }
+
+
+        Tabs({ barPosition: this.currentBreakpoint == 'lg' ? BarPosition.Start: BarPosition.End }) {
+            TabContent() {
+                Text('首页的内容' + this.currentBreakpoint).fontSize(30)
             }
-            .vertical(false)    // 页签水平排列（禁止竖直）
-            .scrollable(true)   // 页签可滚动
-            .layoutWeight(1)
-            .backgroundColor('#ffdbd9d9')
-            .barHeight(3)       // 控制页签栏上面轮廓的宽度
-            .onChange((index: number) => {
-                this.selectedIndex = index;
-            })
+            .tabBar('首页')
 
-            CustomTabBar({ selectedIndex: this.selectedIndex, tabsInfo: this.tabsInfo })
+            TabContent() {
+                BillPage({
+                                    billInfo:$billInfo
+                                })
+            }
+            .tabBar('明细')
+
+
+
+            TabContent() {
+                ProfilePage()
+            }
+            .tabBar("我的")
         }
-        .height('100%')
-        .width('100%')
-    }
+        .vertical(this.currentBreakpoint == 'lg' ? true : false)
+        .barWidth(this.currentBreakpoint == 'lg' ? 100 : '')
+        .barHeight(this.currentBreakpoint == 'lg' ? 200 : '')
+        }
 }
