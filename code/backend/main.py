@@ -32,6 +32,10 @@ class DETAIL(db.Model):
     __table_name__ = "DETAIL"
     user_name = db.Column(db.String(100), nullable = False)
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    bill_type = db.Column(db.Integer, nullable = False)
+    money = db.Column(db.Float, nullable = False)
+    content = db.Column(db.String(200))
+    date = db.Column(db.Date, nullable = False)
     
 
 with app.app_context():#获取上下文
@@ -95,17 +99,17 @@ def detail_add():
 def detail_delete():
     #删除某条数据
     json_data = request.get_json()
+    id = json_data["id"]
     with db.engine.connect() as conn:
         rs = conn.execute(text(f"delete from detail where id = {id}"))
-    detail = DETAIL.query.filter_by(id = 2).first()
-    db.session.delete(detail)
-    db.session.commit()
-    return "delete"
+    return 200
+
 @app.route('/api/update')
 def detail_update():
     #修改某条数据
     json_data = request.get_json()
     #todo
+
 @app.route('/api/sign')
 def sign():
     #登陆处理
