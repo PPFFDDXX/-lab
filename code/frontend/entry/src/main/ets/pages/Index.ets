@@ -1,7 +1,7 @@
 import { TAB_INFO } from '../model/TabBarClass'
 import { TabBarClass } from '../model/TabBarClass'
 import {BillInfoType,TempBills} from '../model/BillInfoType'
-
+import {ProfilePage} from '../pages/ProfilePage'
 import { CustomTabBar } from '../components/CustomTabBar'
 import {BillPage} from '../components/BillPage'
 
@@ -52,8 +52,7 @@ struct Index {
                 }
 
                 TabContent() {
-                    //ProfilePage()
-                    Text("我的")
+                    ProfilePage()
                 }
             }
             .vertical(false)    // 页签水平排列（禁止竖直）
