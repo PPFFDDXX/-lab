@@ -75,8 +75,8 @@ def detail(user_id):
     return id
     
 @app.route('/api/update_user')
-#实现修改密码
 def user_update():
+    # 实现修改密码
     json_data = request.get_json()
     user_name = json_data['user_name']
     password = json_data['password']
@@ -87,11 +87,13 @@ def user_update():
 
 @app.route('/api/add')
 def detail_add():
+    #添加某条数据
     json_data = request.get_json()
     #todo
 
 @app.route('/api/delete')
 def detail_delete():
+    #删除某条数据
     json_data = request.get_json()
     with db.engine.connect() as conn:
         rs = conn.execute(text(f"delete from detail where id = {id}"))
@@ -101,20 +103,12 @@ def detail_delete():
     return "delete"
 @app.route('/api/update')
 def detail_update():
+    #修改某条数据
     json_data = request.get_json()
     #todo
-
-# @app.route('/api/detail/delete/<int:id>')
-# def detail_delete(id):
-#     with db.engine.connect() as conn:
-#         rs = conn.execute(text(f"delete from detail where id = {id}"))
-#     # detail = DETAIL.query.filter_by(id = 2).first()
-#     # db.session.delete(detail)
-#     # db.session.commit()
-#     return "delete"
-
 @app.route('/api/sign')
 def sign():
+    #登陆处理
     json_data = request.get_json()
     is_sign_up = json_data['is_sign_up']
     user_name = json_data['user_name']
@@ -129,6 +123,12 @@ def sign():
         else:
             #todo 传递数据
             return "登陆成功！"
+
+@app.route('/api/get_data/<string:user_name>')
+def get_data(user_name):
+    #前端获取数据
+    user = USER.query.filter_by(user_name=user_name)
+    #todo
 
 if __name__ == '__main__':
     app.run(debug=True)
