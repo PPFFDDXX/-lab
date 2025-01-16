@@ -136,7 +136,7 @@ export interface userData {
     user_name: string
 }
 
-export interface addForm {
+interface addForm {
     user_name: string,
     type: number,
     money: number,
