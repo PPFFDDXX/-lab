@@ -24,6 +24,10 @@ export function isExpense(billinfo:BillInfoType):boolean {
 export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date): Map<string, BillInfoType[]> {
     const groupedBills: Map<string, BillInfoType[]> = new Map();
 
+    if(billinfos == null || billinfos.length == 0){
+        return groupedBills;
+    }
+
     const selectedMon: number = selectedDate.getMonth() + 1;
     const selectedYear: number = selectedDate.getFullYear();
 
@@ -53,7 +57,9 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
 
 export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date): Map<number, BillInfoType[]> {
     const groupedBills: Map<number, BillInfoType[]> = new Map();
-
+    if(billinfos == null){
+        return groupedBills;
+    }
     const selectedYear: number = selectedDate.getFullYear();
 
     billinfos.forEach(bill => {
@@ -125,7 +131,11 @@ export function CalLeft(BillInfos:BillInfoType[]):number {
 数据接口
  */
 
-interface addForm {
+export interface userData {
+    user_name: string
+}
+
+export interface addForm {
     user_name: string,
     type: number,
     money: number,
@@ -144,6 +154,8 @@ interface updateForm {
 /*
 与后端交互的api接口函数
  */
+
+
 
 export async function addData(
     userName: string,
@@ -187,24 +199,25 @@ export async function deleteData(
     return response.data['status']
 }
 
-export async function updateData(
-    userName: string,
-    id: number,
-    type: number,
-    money: number,
-    content: string,
-    date: string
-): Promise<number> {
-    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>('http://127.0.0.1:5000/api/update', {
-        user_name: userName,
-        id: id,
-        type: type,
-        money: money,
-        content: content,
-        date: date
-    })
-    if (response.data['status'] == 200) {
-        console.log('成功修改')
-    }
-    return response.data['status']
-}
+// export async function updateData(
+//     userName: string,
+//     id: number,
+//     type: number,
+//     money: number,
+//     content: string,
+//     date: string
+// ): Promise<number> {
+//     axios.post<number, AxiosResponse<number>, updateForm>('http://10.0.2.2:5000/api/update', {
+//         user_name: userName,
+//         id: id,
+//         type: type,
+//         money: money,
+//         content: content,
+//         date: date
+//     }).then((response: AxiosResponse) =>{
+//
+//
+//     }
+//     )
+//
+// }

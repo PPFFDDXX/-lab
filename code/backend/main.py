@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 HOSTNAME = "127.0.0.1"
-PORT = 3307
+PORT = 3306
 USERNAME = "root"
 PASSWORD = "mysql123" # mysql密码   
 DATABASE = "harmony"  # 数据库名称
@@ -110,9 +110,10 @@ def user_update():
 
     return "200"
 
-@app.route("/api/add")
+@app.route("/api/add", methods=["POST"])
 def detail_add():
     #添加某条数据
+    print("dadadadadadadad")
     json_data = request.get_json()
 
     user_name = json_data["user_name"]
@@ -125,9 +126,9 @@ def detail_add():
     db.session.add(new_one)
     db.session.commit()
 
-    return "200"
+    return jsonify({"status": 200})
 
-@app.route("/api/delete")
+@app.route("/api/delete", methods=["POST"])
 def detail_delete():
     #删除某条数据
     json_data = request.get_json()
@@ -138,7 +139,7 @@ def detail_delete():
     db.session.commit()
     return "200"
 
-@app.route("/api/update")
+@app.route("/api/update", methods=["POST"])
 def detail_update():
     #修改某条数据
     json_data = request.get_json()
@@ -192,7 +193,7 @@ def sign():
         else:
             return jsonify({"status": 0, "message": "登录成功"})
 
-@app.route("/api/get_data/<string:user_name>")
+@app.route("/api/get_data/<string:user_name>",methods=['GET'])
 def get_data(user_name):
     #前端获取数据
     details = DETAIL.query.filter_by(user_name = user_name)
@@ -209,10 +210,10 @@ def get_data(user_name):
         data["type"] = detail.bill_type
         data["money"] = detail.money
         data["content"] = detail.content
-        data["date"] = datetime.strftime(detail.date, "%Y-%m-%d")
-
+        # data["date"] = datetime.strftime(detail.date, "%Y-%m-%d")
+        data["date"] = detail.date
         datas.append(data)
-
+    print(datas)
     json["datas"] = datas
 
     return jsonify(json)

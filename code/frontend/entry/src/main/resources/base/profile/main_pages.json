@@ -4,6 +4,7 @@
     "pages/LoginPage",
     "pages/AddBalance",
     "pages/BillInfos",
-    "pages/RegisterPage"
+    "pages/RegisterPage",
+    "pages/BIllDetail"
   ]
 }

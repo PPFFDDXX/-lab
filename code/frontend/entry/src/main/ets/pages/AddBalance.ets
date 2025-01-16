@@ -4,6 +4,9 @@ import { defaultType, IBillType } from '../model/BillType';
 import { promptAction } from '@kit.ArkUI';
 import { BillInfoType } from '../model/BillInfoType';
 import { formatDateToYMD } from '../util/DealTime';
+import axios, { AxiosResponse } from '@ohos/axios';
+import { addForm } from '../util/DealBill';
+import { ap } from '../common/trans';
 
 interface IKeyboardUnit {
     content: string | Resource,
@@ -12,7 +15,6 @@ interface IKeyboardUnit {
     bgColor?: ResourceColor,
     foreColor?: ResourceColor
 }
-
 
 
 enum calculateAction {
@@ -25,30 +27,31 @@ enum calculateAction {
 @Entry
 @Component
 struct AddBalance {
-
     @State activeYear: number = (router.getParams() as ESObject)['year'];
     @State activeMonth: number = (router.getParams() as ESObject)['month'];
-    @State isUpdate: boolean = (router.getParams() as ESObject)['isUpdate'];  //判断当前是update还是 add
-    @State updateBillInfo: BillInfoType = (this.isUpdate)?(router.getParams() as ESObject)['updateBillInfo']:undefined;  // 要update的bill的信息
+    @State isUpdate: boolean = (router.getParams() as ESObject)['isUpdate']; //判断当前是update还是 add
+    @State updateBillInfo: BillInfoType =
+        (this.isUpdate) ? (router.getParams() as ESObject)['updateBillInfo'] : undefined; // 要update的bill的信息
+    @State activeTab: number = (this.isUpdate) ? (this.updateBillInfo.type > 17 ? 1 : 0) : 0;
+    activeTypeRes: Resource = $r("app.media.salaryIcon");
+    @State selectedTypeName: string = (this.isUpdate) ? (defaultType[this.updateBillInfo.type].title) : '';
+    @State selectedType : number = -1;
 
-
-    @State activeTab: number = (this.isUpdate)?(this.updateBillInfo.type > 17 ? 1: 0): 0;
-    activeType: Resource = $r("app.media.salaryIcon");
-
-    @State selectedTypeName: string =(this.isUpdate)?(defaultType[this.updateBillInfo.type].title): '';
-    @State balanceAmount: string = (this.isUpdate)?(this.updateBillInfo.money.toFixed(2)):"0.00";
+    @State balanceAmount: string = (this.isUpdate) ? (this.updateBillInfo.money.toFixed(2)) : "0.00";
     @State calOp: string = "";
-    @State content: string = (this.isUpdate)?this.updateBillInfo.content:"";
-    @State calculateAction: calculateAction =(this.isUpdate)?calculateAction.input: calculateAction.start;
+    @State content: string = (this.isUpdate) ? this.updateBillInfo.content : "";
+    @State calculateAction: calculateAction = (this.isUpdate) ? calculateAction.input : calculateAction.start;
     @State doneButtonText: string = "√";
-
-
     @State activeDay: number = new Date().getDate();
     activeDate: Date = new Date();
     context = getContext(this) as common.UIAbilityContext;
     filesDir = this.context.filesDir;
-    @State inputMarginTop: number = (this.isUpdate)?0:1000; //输入控件的上外边距
-    @State inputOpacity: number = (this.isUpdate)?1:0; //输入控件的透明度
+    @State inputMarginTop: number = (this.isUpdate) ? 0 : 1000; //输入控件的上外边距
+    @State inputOpacity: number = (this.isUpdate) ? 1 : 0; //输入控件的透明度
+
+    aboutToAppear(): void {
+        //获取URL参数来初始化
+    }
 
     ChangeUnit(number: string): void {
         if (this.balanceAmount == "0.00") {
@@ -61,32 +64,54 @@ struct AddBalance {
             this.calculateAction = calculateAction.input;
         } else if (this.calculateAction == calculateAction.precal) {
             this.calculateAction = calculateAction.cal;
-            this.balanceInputUnits[15].content = '='
-            this.doneButtonText = '=';
+            this.balanceInputUnits[15].content = '=' //似乎没有用
+            this.doneButtonText = '='; //似乎没有用
         }
     }
 
-    ClearInput():void {
+    ClearInput(): void {
         this.balanceAmount = '0.00';
         this.calculateAction = calculateAction.start;
         this.calOp = '';
         this.content = '';
+
     }
 
-    AddBill(userName: string,
+    AddBill(user_name: string|null,
         type: number,
         money: number,
         content: string,
         date: string) {
 
         //这里调用add_data
-        promptAction.showToast({
-            message: "上传成功！",
-            duration: 2000
+
+        axios.post<number, AxiosResponse<number>, addForm>('http://10.0.2.2:5000/api/add', {
+            user_name: user_name,
+            type: type,
+            money: money,
+            content: content,
+            date: date
         })
-        this.ClearInput()
-        this.inputMarginTop = 1000;
-        this.inputOpacity = 0;
+            .then((response: AxiosResponse) => {
+                console.log("finish!");
+
+                if (response.data['status'] == 200) {
+                    console.log("finished!");
+                    setTimeout(() => {
+                        this.getUIContext().getPromptAction().showToast({
+                            message: "上传成功！",
+                            duration: 2000
+                        })
+                    }, 1000)
+                }
+
+                this.ClearInput();
+                this.inputMarginTop = 1000;
+                this.inputOpacity = 0;
+            }
+            )
+
+
     }
 
     balanceInputUnits: IKeyboardUnit[] =
@@ -118,6 +143,7 @@ struct AddBalance {
                             this.activeYear = v.year;
                             this.activeMonth = v.month;
                             this.activeDay = v.day;
+                            this.activeDate.setFullYear(v.year,v.month,v.day)
                         },
                         selected: this.activeDate
                     })
@@ -211,7 +237,7 @@ struct AddBalance {
                         case calculateAction.input:
                             this.calOp = '-';
                             this.balanceAmount += '-';
-                            this.calculateAction = calculateAction.precal//
+                            this.calculateAction = calculateAction.precal //
                             break;
 
 
@@ -284,13 +310,13 @@ struct AddBalance {
                     // 错误检测
                     if (this.calculateAction == calculateAction.start || this.balanceAmount == "0") {
                         promptAction.showToast({
-                            message: "数字不能为0",
+                            message: "金额不能为0",
                             duration: 2000
                         })
                         return;
                     }
 
-                    if (parseFloat(this.balanceAmount) < 0){
+                    if (parseFloat(this.balanceAmount) < 0) {
                         promptAction.showToast({
                             message: "金额不能为负",
                             duration: 2000
@@ -311,11 +337,11 @@ struct AddBalance {
                         })
                         return;
                     }
-                    if(this.isUpdate){
+                    if (this.isUpdate) {
                         //update Bill
-                    }
-                    else{
-                        this.AddBill("test",1,parseFloat(this.balanceAmount),this.content,formatDateToYMD(this.activeDate))
+                    } else {
+                        this.AddBill(ap.account, this.selectedType, parseFloat(this.balanceAmount), this.content,
+                            formatDateToYMD(this.activeDate))
                     }
                 }
             }
@@ -381,7 +407,7 @@ struct AddBalance {
                         })
                         .textAlign(TextAlign.End)
                         .margin({ right: 24 })
-                        .onClick(()=>{
+                        .onClick(() => {
                             animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
                                 this.inputMarginTop = 1000;
                                 this.inputOpacity = 0;
@@ -394,45 +420,47 @@ struct AddBalance {
                 .width('100%')
 
                 GridRow({ columns: 4, gutter: 12 }) {
-                    ForEach(this.activeTab == 0 ? defaultType.slice(0,18) : defaultType.slice(18,23), (item: IBillType) => {
-                        GridCol() {
-                            Column({ space: 4 }) {
-                                Row() {
-                                    Image(item.img)
-                                        .width(24)
-                                        .height(24)
-                                        .onClick(() => {
-                                            this.selectedTypeName = item.title;
-                                            this.activeType = item.img;
-                                            animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
-                                                this.inputMarginTop = 0;
-                                                this.inputOpacity = 1;
+                    ForEach(this.activeTab == 0 ? defaultType.slice(0, 18) : defaultType.slice(18, 23),
+                        (item: IBillType) => {
+                            GridCol() {
+                                Column({ space: 4 }) {
+                                    Row() {
+                                        Image(item.img)
+                                            .width(24)
+                                            .height(24)
+                                            .onClick(() => {
+                                                this.selectedTypeName = item.title;
+                                                this.activeTypeRes = item.img;
+                                                this.selectedType = item.typeID;
+                                                animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
+                                                    this.inputMarginTop = 0;
+                                                    this.inputOpacity = 1;
+                                                })
                                             })
+                                    }
+                                    .shadow({ radius: 24, color: $r('app.color.main_theme_shadow') })
+                                    .borderRadius(16)
+                                    .backgroundColor(this.selectedTypeName == item.title ? "#ffcfe8ff" : "white")
+                                    .width(48)
+                                    .height(48)
+                                    .justifyContent(FlexAlign.Center)
+                                    .onClick(() => {
+                                        this.selectedTypeName = ''
+                                        animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
+                                            this.inputMarginTop = 1000;
+                                            this.inputOpacity = 0;
                                         })
-                                }
-                                .shadow({ radius: 24, color: $r('app.color.main_theme_shadow') })
-                                .borderRadius(16)
-                                .backgroundColor(this.selectedTypeName == item.title ? "#ffcfe8ff" : "white")
-                                .width(48)
-                                .height(48)
-                                .justifyContent(FlexAlign.Center)
-                                .onClick(() => {
-                                    this.selectedTypeName = ''
-                                    animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
-                                        this.inputMarginTop = 1000;
-                                        this.inputOpacity = 0;
                                     })
-                                })
 
-                                Row() {
-                                    Text(item.title).fontSize(12)
+                                    Row() {
+                                        Text(item.title).fontSize(12)
+                                    }
                                 }
-                            }
-                            .width(56)
-                            .height(68)
+                                .width(56)
+                                .height(68)
 
-                        }
-                    })
+                            }
+                        })
                 }
                 .padding(12)
             }
@@ -448,13 +476,16 @@ struct AddBalance {
                 }.height(36)
 
                 Row() {
-                    TextInput({ placeholder: (this.isUpdate)?"":"点击填写备注",text:(this.isUpdate)?this.updateBillInfo.content:"" })
-
+                    TextInput({
+                        placeholder: (this.isUpdate) ? "" : "点击填写备注",
+                        text: this.content
+                    })
                         .margin(16)
                         .borderRadius(8)
                         .onChange((v) => {
                             this.content = v;
                         })
+
                 }
 
                 GridRow({ columns: 4, gutter: 0 }) {

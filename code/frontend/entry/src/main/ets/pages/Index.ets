@@ -1,11 +1,14 @@
 import { TAB_INFO } from '../model/TabBarClass'
 import { TabBarClass } from '../model/TabBarClass'
-import {BillInfoType,TempBills} from '../model/BillInfoType'
-import {ProfilePage} from '../pages/ProfilePage'
+import { BillInfoType, TempBills } from '../model/BillInfoType'
+import { ProfilePage } from '../pages/ProfilePage'
 import { CustomTabBar } from '../components/CustomTabBar'
-import {BillPage} from '../components/BillPage'
+import { BillPage } from '../components/BillPage'
 
 import mediaquery from '@ohos.mediaquery';
+import axios, { AxiosResponse } from '@ohos/axios'
+import { userData } from '../util/DealBill'
+import { ap } from '../common/trans'
 
 let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
 
@@ -19,14 +22,13 @@ function onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
 }
 
 listener.on('change', onPortrait);
+
 @Entry
 @Component
 struct Index {
     @State message: string = 'Hello World';
-
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
-
     @State billInfo: BillInfoType[] = [];
     private controller: TabsController = new TabsController();
     @State currentBreakpoint: string = 'md';
@@ -35,7 +37,7 @@ struct Index {
     private mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)');
     private lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)');
 
-    registerBreakpoint(){
+    registerBreakpoint() {
         if (this.xsListener.matches) {
             this.updateCurrentBreakpoint('xs')
         }
@@ -62,23 +64,30 @@ struct Index {
 
     onPageHide(): void {
     }
+
     aboutToAppear(): void {
-        this.billInfo = TempBills;
+        // this.billInfo = TempBills;
+        axios.get<number, AxiosResponse<number>, null>('http://127.0.0.1:5000/api/get_data/'+ap.account)
+            .then((response: AxiosResponse) => {
+                console.log("读取数据");
+                console.log(response.data['data']);
+                this.billInfo = response.data['datas']
+            }
+            )
         this.registerBreakpoint()
 
     }
+
     onPageShow(): void {
         //这里调用函数获取数据吗?还是在登录界面实现
         //应该是的，这里每次调用接口来获取更新后的数据
-        this.billInfo = TempBills;
+        // this.billInfo = TempBills;
     }
 
     build() {
 
 
-
-
-        Tabs({ barPosition: this.currentBreakpoint == 'lg' ? BarPosition.Start: BarPosition.End }) {
+        Tabs({ barPosition: this.currentBreakpoint == 'lg' ? BarPosition.Start : BarPosition.End }) {
             TabContent() {
                 Text('首页的内容' + this.currentBreakpoint).fontSize(30)
             }
@@ -86,11 +95,10 @@ struct Index {
 
             TabContent() {
                 BillPage({
-                    billInfo:$billInfo
+                    billInfo: $billInfo
                 })
             }
             .tabBar('明细')
-
 
 
             TabContent() {
@@ -101,5 +109,5 @@ struct Index {
         .vertical(this.currentBreakpoint == 'lg' ? true : false)
         .barWidth(this.currentBreakpoint == 'lg' ? 100 : '')
         .barHeight(this.currentBreakpoint == 'lg' ? 200 : '')
-        }
+    }
 }
