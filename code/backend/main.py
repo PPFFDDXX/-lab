@@ -173,7 +173,7 @@ def sign():
     if is_sign_up:
         print("开始注册")
         # 下面的判断用户已存在存在问题,如需要查看可以注释掉下面两行
-        if user_query(user_name, password) == -2:
+        if user_query(user_name, password) != -2:
             return jsonify({"status": -3, "message": "账号已存在"})  # 需要返回 JSON 格式
         print("没有这个用户")
         # 注册用户

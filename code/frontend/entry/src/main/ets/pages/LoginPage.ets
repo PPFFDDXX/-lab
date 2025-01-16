@@ -1,16 +1,18 @@
 import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
 import http from '@ohos.net.http';
-import {ap} from '../common/trans';
-import axios from '@ohos/axios'
+import { ap } from '../common/trans';
+import axios, { AxiosResponse } from '@ohos/axios'
+import { user } from './RegisterPage';
+
 @Entry
 @Component
 struct LauncherPage {
-
-  @State account:string='';
-  @State password:string='';
-    private countDownSeconds : number = 100000000  //登录界面持续时间，后面删除；应改为密码账号正确才可进入
+    @State account: string = '';
+    @State password: string = '';
+    private countDownSeconds: number = 100000000 //登录界面持续时间，后面删除；应改为密码账号正确才可进入
     private timeId: number = 0;
+
     onPageShow(): void {
         this.timeId = setInterval(() => {
             this.countDownSeconds--;
@@ -46,91 +48,86 @@ struct LauncherPage {
                 .width(80)
                 .height(80)
                 .borderRadius(50)
-                .margin({ top:"120vp" })
+                .margin({ top: "120vp" })
             Text("欢迎使用")
                 .fontColor(Color.Black)
                 .fontSize(14)
-                .margin({ top:"25vp",bottom:'10vp' })
-            TextInput({placeholder:'请输入账号'})
-                .margin({bottom:'10vp'})
+                .margin({ top: "25vp", bottom: '10vp' })
+            TextInput({ placeholder: '请输入账号' })
+                .margin({ bottom: '10vp' })
                 .width('320vp')
-                .onChange((value:string)=>{
-                    this.account=value;
+                .onChange((value: string) => {
+                    this.account = value;
                 })
-            TextInput({placeholder:'请输入密码'})
+            TextInput({ placeholder: '请输入密码' })
                 .type(InputType.Password)
                 .width('320vp')
-                .onChange((value:string)=>{
-                    this.password=value;
+                .onChange((value: string) => {
+                    this.password = value;
                 })
-                .margin({bottom:'20vp'})
-            Button('登录').width('100%').type(ButtonType.Capsule)
-                .margin({bottom:'15vp'})
+                .margin({ bottom: '20vp' })
+            Button('登录')
+                .width('100%')
+                .type(ButtonType.Capsule)
+                .margin({ bottom: '15vp' })
                 .width('150vp')
-                .onClick(()=>{
+                .onClick(() => {
                     this.login();
                 })
             Text('注册账号').fontColor(Color.Blue).fontSize(14)
-                .onClick(()=>{
+                .onClick(() => {
                     router.pushUrl({
-                        url:'pages/RegisterPage'
+                        url: 'pages/RegisterPage'
                     })
                 })
             LoadingProgress().width(50).height(50).color(Color.Blue)
             Blank()
 
-        }.border({width:1})
+        }
+        .border({ width: 1 })
         .width("100%")
         .height("100%")
         .alignItems(HorizontalAlign.Center)
         .justifyContent((FlexAlign.Center))
     }
-    login(){
+
+    login() {
         //判断是否存在账号
-        if(this.account==''||this.password==''){
+        if (this.account == '' || this.password == '') {
             promptAction.showToast({
-                message:'账号或密码不能为空',
-                duration:2000
+                message: '账号或密码不能为空',
+                duration: 2000
             })
             return
         }
-        const httpReq=http.createHttp()
-        const serve=httpReq.request('http://127.0.0.1:5000/api/sign',{
-            method:http.RequestMethod.POST,
-            header:{
-                "Content-Type":"application/json"
-            },
-            extraData:JSON.stringify({
-                'is_sign_up':false,
-                'user_name':this.account,
-                'password':this.password
-            })
-        })
-        serve.then(res=>{
+        axios.post<number, AxiosResponse<number>, user>('http://10.0.2.2:5000/api/sign', {
+            is_sign_up: false,
+            user_name: this.account,
+            password: this.password
+        }).then((response: AxiosResponse) => {
             //
-            if(res.result&&JSON.parse(res.result as string).code==-2){
-                promptAction.showToast({
-                    message:"不存在的账号",
-                    duration:2000
+            if (response && response.data['status'] == -2) {
+                this.getUIContext().getPromptAction().showToast({
+                    message: '不存在的账号',
+                    duration: 2000
+                })
+                return
+            } else if (response && response.data['status'] == -1) {
+                this.getUIContext().getPromptAction().showToast({
+                    message: '密码错误',
+                    duration: 2000
                 })
                 return
             }
-            else if(res.result&&JSON.parse(res.result as string).code==-1){
-                promptAction.showToast({
-                    message:"密码错误",
-                    duration:2000
-                })
-                return
-            }
-        })
-        ap.account=this.account
-        promptAction.showToast({
-            message:"登录成功",
-            duration:2000
-        })
-        router.replaceUrl({
-            url:'pages/Index'
-        })
+            ap.account = this.account
+            this.getUIContext().getPromptAction().showToast({
+                message: "登录成功",
+                duration: 2000
+            })
+            this.getUIContext().getRouter().replaceUrl({
+                url: 'pages/Index'
+            })
+        });
 
     }
 }

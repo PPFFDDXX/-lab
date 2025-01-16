@@ -2,8 +2,9 @@ import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
 import http from '@ohos.net.http';
 import axios, { AxiosResponse } from '@ohos/axios'
+import { ap } from '../common/trans';
 
-interface user {
+export interface user {
     is_sign_up: boolean,
     user_name: string,
     password: string
@@ -95,7 +96,7 @@ struct RegisterPage {
                     //
                     // })
 
-                    axios.post<number, AxiosResponse<number>, user>('http://127.0.0.1:5000/api/sign', {
+                    axios.post<number, AxiosResponse<number>, user>('http://10.0.2.2:5000/api/sign', {
                         is_sign_up: true,
                         user_name: this.account,
                         password: this.password1
@@ -119,12 +120,13 @@ struct RegisterPage {
                         //   router.back();
                         //
 
+                        // 下面是注册成功
+                        ap.account = this.account;
                         this.getUIContext().getPromptAction().showToast({
                             message: '注册成功',
                             duration: 2000
                         })
                         this.getUIContext().getRouter().back()
-
                     }).catch((error: Error) => {
                         console.error("Request failed:", error);
                     });
