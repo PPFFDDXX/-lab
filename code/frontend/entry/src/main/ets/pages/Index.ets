@@ -7,7 +7,7 @@ import { BillPage } from '../components/BillPage'
 
 import mediaquery from '@ohos.mediaquery';
 import axios, { AxiosResponse } from '@ohos/axios'
-import { SpliteBillsByDate, userData } from '../util/DealBill'
+import { CalBill, CalIncome, SpliteBillsByDate, userData } from '../util/DealBill'
 import { ap, bills, http_url } from '../common/trans'
 import { http } from '@kit.NetworkKit'
 
@@ -30,6 +30,9 @@ struct Index {
     @State message: string = 'Hello World';
 
     @State selectedDate: Date = new Date();
+
+    @State totalIncome: number = 0;
+    @State totalBalance: number = 0;
 
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
@@ -97,6 +100,9 @@ struct Index {
                     console.log(response.data['data']);
                     this.billInfo = response.data['datas']
                     this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
+                    const Obj:[number,number] = CalBill(this.BillsByDate);
+                    this.totalBalance = Obj[0];
+                    this.totalIncome = Obj[1];
                 }
                 )
             bills.isChanged = false;
@@ -108,15 +114,12 @@ struct Index {
 
         Tabs({ barPosition: this.currentBreakpoint == 'lg' ? BarPosition.Start : BarPosition.End }) {
             TabContent() {
-                Text('首页的内容' + this.currentBreakpoint).fontSize(30)
-            }
-            .tabBar('首页')
-
-            TabContent() {
                 BillPage({
                     billInfo: $billInfo,
                     selectedDate:$selectedDate,
-                    BillsByDate:$BillsByDate
+                    BillsByDate:$BillsByDate,
+                    totalIncome:$totalIncome,
+                    totalBalance:$totalBalance
                 })
             }
             .tabBar('明细')

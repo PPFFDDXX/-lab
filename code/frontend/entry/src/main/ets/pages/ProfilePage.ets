@@ -4,6 +4,7 @@ import { pasteboard } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import Want from '@ohos.app.ability.Want';
 import Router from '@system.router';
+import { ap } from '../common/trans';
 
 @Component
 export struct ProfilePage{
@@ -39,7 +40,7 @@ export struct ProfilePage{
           router.pushUrl({url:'pages/LoginPage'})
         })
         */
-        Text(/*this.token?this.userInfo.nickname:'暂未登录'*/"abc")
+        Text((ap.account != null)?ap.account:"abc")
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(Color.Black)
@@ -201,6 +202,7 @@ struct CustomDialogDemo {
         Button('退出')
           .onClick(() => {
             if (this.controller != undefined) {
+              ap.account = null;
               router.replaceUrl({
                 url: 'pages/LoginPage'
               })

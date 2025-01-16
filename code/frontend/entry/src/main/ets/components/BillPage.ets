@@ -15,8 +15,8 @@ import axios, { AxiosResponse } from '@ohos/axios'
 @Component
 export struct BillPage {
     @Link selectedDate: Date ;
-    @State totalIncome: number = 0;
-    @State totalBalance: number = 0;
+    @Link totalIncome: number;
+    @Link totalBalance: number ;
     @Link billInfo: BillInfoType[]
     @Link BillsByDate: Map<string, BillInfoType[]> ;
 
@@ -209,7 +209,7 @@ export struct BillPage {
                         showInSubWindow: true,
                         isModal: true,
                         width: '40%',
-                        height: '15%',
+                        height: '20%',
                         cornerRadius: 20,
                         borderWidth: 1,
                         borderStyle: BorderStyle.Solid,
@@ -265,7 +265,12 @@ export struct BillPage {
                             {
                                 title: '查看明细',
                                 action: () => {
-                                    console.log('pears')
+                                    router.pushUrl(({
+                                        url: "pages/BIllDetail",
+                                        params:{
+                                            billInfo:billInfo
+                                        }
+                                    }))
                                 }
                             }
                         ]

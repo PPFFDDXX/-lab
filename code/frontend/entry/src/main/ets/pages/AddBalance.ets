@@ -18,6 +18,13 @@ interface IKeyboardUnit {
     foreColor?: ResourceColor
 }
 
+interface UrlParam {
+    year: number,
+    month: number,
+    isUpdate: boolean,
+    updateBillInfo:BillInfoType
+}
+
 
 enum calculateAction {
     start,
@@ -30,11 +37,11 @@ enum calculateAction {
 @Component
 struct AddBalance {
 
-    @State activeYear: number = (router.getParams() as ESObject)['year'];
-    @State activeMonth: number = (router.getParams() as ESObject)['month'];
-    @State isUpdate: boolean = (router.getParams() as ESObject)['isUpdate']; //判断当前是update还是 add
-    @State updateBillInfo: BillInfoType =
-        (this.isUpdate) ? (router.getParams() as ESObject)['updateBillInfo'] : undefined; // 要update的bill的信息
+    @State activeYear: number = (router.getParams() as UrlParam).year ;
+    @State activeMonth: number = (router.getParams() as UrlParam).month;
+    @State isUpdate: boolean = (router.getParams() as UrlParam).isUpdate; //判断当前是update还是 add
+    @State updateBillInfo: BillInfoType=
+        (router.getParams() as UrlParam).updateBillInfo ; // 要update的bill的信息
     @State activeTab: number = (this.isUpdate) ? (this.updateBillInfo.type > 17 ? 1 : 0) : 0;
     activeTypeRes: Resource = $r("app.media.salaryIcon");
     @State selectedTypeName: string = (this.isUpdate) ? (defaultType[this.updateBillInfo.type].title) : '';

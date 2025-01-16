@@ -91,3 +91,9 @@ export function getCurrentMonYear(): string {
     }
 }
 
+/*
+* 格式化处理日期字符串转化为中文的年月日加星期
+* 如输入'2025-01-16'
+ */
+
+// export function
