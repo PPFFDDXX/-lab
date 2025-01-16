@@ -96,46 +96,33 @@ struct RegisterPage {
                     //
                     // })
 
-                    axios.post<number, AxiosResponse<number>, user>('http://10.0.2.2:5000/api/sign', {
-                        is_sign_up: true,
-                        user_name: this.account,
-                        password: this.password1
-                    }).then((response: AxiosResponse) => {
-                        console.log('Response received:', JSON.stringify(response)); // 查看是否收到响应
-                        //Request failed: Error: Internal error. UI execution context not found.
-                        //UI 操作发生在非 UI 线程
-                        //不能 直接showtoast
-                        if (response.data['status'] == -3) {
-                            console.log("账号已存在")
-                            this.getUIContext().getPromptAction().showToast({
-                                message: '账号已存在',
-                                duration: 2000
-                            })
-                            return
-                        }
-
-                        //Request failed: Error: Param error. UI execution context not found.
-                        // 不能router.back();
-                        // console.log("注册成功")
-                        //   router.back();
-                        //
-
-                        // 下面是注册成功
-                        ap.account = this.account;
-                        this.getUIContext().getPromptAction().showToast({
-                            message: '注册成功',
-                            duration: 2000
-                        })
-                        this.getUIContext().getRouter().back()
-                    }).catch((error: Error) => {
-                        console.error("Request failed:", error);
-                    });
-                })
-        }
-        .border({ width: 1 })
-        .width("100%")
-        .height("100%")
-        .alignItems(HorizontalAlign.Center)
-        .justifyContent((FlexAlign.Center))
-    }
+          axios.post<string,AxiosResponse<string>,user>('http://10.0.2.2:5000/api/sign',{
+            is_sign_up:true,
+            user_name:this.account,
+            password:this.password1
+          },{
+            headers:{'Content-Type':'application/json'},
+            transformRequest:(data:user)=>{
+              return JSON.stringify(data)
+            }
+          }).then((response:AxiosResponse)=>{
+            if(response.data === -3){
+              promptAction.showToast({
+              message:'账号已存在',
+              duration:2000
+              })
+              return
+            }
+            promptAction.showToast({
+                    message:'注册成功，请返回登录界面',
+                    duration:2000
+                  })
+          })
+        })
+    }.border({width:1})
+    .width("100%")
+    .height("100%")
+    .alignItems(HorizontalAlign.Center)
+    .justifyContent((FlexAlign.Center))
+  }
 }
