@@ -6,10 +6,11 @@ from datetime import datetime
 app = Flask(__name__)
 
 HOSTNAME = "127.0.0.1"
-PORT = 3306
+PORT = 3307
 USERNAME = "root"
-PASSWORD = "mysql123"
-DATABASE = "harmony"
+PASSWORD = "235813xYf" # mysql密码   
+DATABASE = "harmony"  # 数据库名称
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE}?charset=utf8mb4"
 
@@ -157,34 +158,39 @@ def detail_update():
 
     return "200"
 
-@app.route("/api/sign")
+from flask import jsonify
+
+@app.route("/api/sign", methods=["POST"])
 def sign():
-    #登陆处理
     print("sign")
     json_data = request.get_json()
 
     is_sign_up = json_data["is_sign_up"]
     user_name = json_data["user_name"]
     password = json_data["password"]
+    print(f"getdata:\nis_sign_up:{is_sign_up}\nuser_name:{user_name}\npassword:{password}")
 
     if is_sign_up:
-        if user_query(user_name,password) == -2:
-            print("-3")
-            return -3
-        else:
-            user_add(user_name,password)
-            print("0")
-            return 0
+        print("开始注册")
+        # 下面的判断用户已存在存在问题,如需要查看可以注释掉下面两行
+        if user_query(user_name, password) == -2:
+            return jsonify({"status": -3, "message": "账号已存在"})  # 需要返回 JSON 格式
+        print("没有这个用户")
+        # 注册用户
+        user_add(user_name, password)
+        return jsonify({"status": 0, "message": "注册成功"})
     else:
-        if user_query(user_name,password) == -2:
-            print("-2")
-            return -2
-        elif user_query(user_name,password) == -1:
-            print("-1")
-            return -1
+        # 如果用户不存在
+        if user_query(user_name, password) == -2:
+            return jsonify({"status": -2, "message": "用户不存在"})
+
+        # 如果密码错误
+        elif user_query(user_name, password) == -1:
+            return jsonify({"status": -1, "message": "密码错误"})
+
+        # 登录成功
         else:
-            print("0")
-            return 0
+            return jsonify({"status": 0, "message": "登录成功"})
 
 @app.route("/api/get_data/<string:user_name>")
 def get_data(user_name):

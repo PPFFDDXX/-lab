@@ -22,8 +22,6 @@ enum calculateAction {
     cal
 }
 
-
-
 @Entry
 @Component
 struct AddBalance {

@@ -86,8 +86,8 @@ struct Index {
 
             TabContent() {
                 BillPage({
-                                    billInfo:$billInfo
-                                })
+                    billInfo:$billInfo
+                })
             }
             .tabBar('明细')
 
