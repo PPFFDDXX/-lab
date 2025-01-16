@@ -4,6 +4,7 @@
 
 import {BillInfoType} from '../model/BillInfoType'
 import { FormatDate, Translate } from './DealTime';
+import axios, { AxiosResponse } from '@ohos/axios'
 
 
 /*
@@ -120,12 +121,30 @@ export function CalLeft(BillInfos:BillInfoType[]):number {
     return totalLeft;
 }
 
+/*
+数据接口
+ */
 
+interface addForm {
+    user_name: string,
+    type: number,
+    money: number,
+    content: string,
+    date: string
+}
 
-
+interface updateForm {
+    user_name: string,
+    id: number,
+    type: number,
+    money: number,
+    content: string,
+    date: string
+}
 /*
 与后端交互的api接口函数
  */
+
 export async function addData(
     userName: string,
     type: number,
@@ -133,14 +152,17 @@ export async function addData(
     content: string,
     date: string
 ): Promise<number> {
-    // const response = await apiRequest<number>('/api/add', 'POST', {
-    //     user_name: userName,
-    //     type: type,
-    //     money: money,
-    //     content: content,
-    //     date: date,
-    // });
-    return 200;
+    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, addForm>('http://127.0.0.1:5000/api/add', {
+        user_name: userName,
+        type: type,
+        money: money,
+        content: content,
+        date: date
+    })
+    if (response.data['status'] == 200) {
+        console.log('成功存入')
+    }
+    return response.data['status']
 }
 
 export async function deleteData(
@@ -151,15 +173,18 @@ export async function deleteData(
     content: string,
     date: string
 ): Promise<number> {
-    // const response = await apiRequest<number>('/api/delete', 'POST', {
-    //     user_name: userName,
-    //     id: id,
-    //     type: type,
-    //     money: money,
-    //     content: content,
-    //     date: date,
-    // });
-    return 200;
+    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>('http://127.0.0.1:5000/api/delete', {
+        user_name: userName,
+        id: id,
+        type: type,
+        money: money,
+        content: content,
+        date: date
+    })
+    if (response.data['status'] == 200) {
+        console.log('成功删除')
+    }
+    return response.data['status']
 }
 
 export async function updateData(
@@ -170,13 +195,16 @@ export async function updateData(
     content: string,
     date: string
 ): Promise<number> {
-    // const response = await apiRequest<number>('/api/update', 'POST', {
-    //     user_name: userName,
-    //     id: id,
-    //     type: type,
-    //     money: money,
-    //     content: content,
-    //     date: date,
-    // });
-    return 200;
+    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>('http://127.0.0.1:5000/api/update', {
+        user_name: userName,
+        id: id,
+        type: type,
+        money: money,
+        content: content,
+        date: date
+    })
+    if (response.data['status'] == 200) {
+        console.log('成功修改')
+    }
+    return response.data['status']
 }
