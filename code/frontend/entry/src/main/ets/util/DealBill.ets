@@ -144,7 +144,7 @@ export interface addForm {
     date: string
 }
 
-interface updateForm {
+export interface updateForm {
     user_name: string,
     id: number,
     type: number,

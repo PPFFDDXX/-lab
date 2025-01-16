@@ -4,26 +4,32 @@ import { BillInfoType } from '../model/BillInfoType'
 
 import { defaultType} from '../model/BillType'
 
-import { isExpense, SpliteBillsByDate } from '../util/DealBill'
+import { isExpense, SpliteBillsByDate, updateForm } from '../util/DealBill'
 
 import { promptAction, router } from '@kit.ArkUI';
 import { CommonConstants } from '../common/CommonConstants'
+import { ap, bills, http_url } from '../common/trans'
+import axios, { AxiosResponse } from '@ohos/axios'
 
 
 @Component
 export struct BillPage {
-    @State selectedDate: Date = new Date();
+    @Link selectedDate: Date ;
     @State totalIncome: number = 0;
     @State totalBalance: number = 0;
     @Link billInfo: BillInfoType[]
-    @State BillsByDate: Map<string, BillInfoType[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
+    @Link BillsByDate: Map<string, BillInfoType[]> ;
 
     // onPageShow(): void {
     //     this.totalIncome = 4;
     //     this.totalBalance = 4;
     // }
+
+    onPageShow(): void {
+
+    }
     aboutToAppear(): void {
-        const BillsByDate: Map<string, BillInfoType[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
+        // const BillsByDate: Map<string, BillInfoType[]> = SpliteBillsByDate(this.billInfo,this.selectedDate);
     }
 
     deleteBill(bill:BillInfoType){
@@ -32,12 +38,28 @@ export struct BillPage {
             this.billInfo.splice(index, 1);
             this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
 
-            //todo:这里调用delete_data(Object O)
-
-            promptAction.showToast({
-                'message':"删除成功",
-                'duration':2000
+            axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
+                user_name: bill.user_name,
+                id: bill.id,
+                type: bill.type,
+                money: bill.money,
+                content: bill.content,
+                date: bill.date
             })
+                .then((response: AxiosResponse) => {
+                    console.log("finish!");
+                    if (response.data['status'] == 200) {
+                        console.log("finished!");
+                        setTimeout(() => {
+                            this.getUIContext().getPromptAction().showToast({
+                                message: "删除成功！",
+                                duration: 2000
+                            })
+                        }, 1000)
+                    }
+                }
+                )
+
         } else {
             promptAction.showToast({
                 'message':"删除失败!",
@@ -119,6 +141,7 @@ export struct BillPage {
                         .width('100%')
                     })
                 }
+                .scrollBar(BarState.Auto)
                 .width('100%')
             }
 

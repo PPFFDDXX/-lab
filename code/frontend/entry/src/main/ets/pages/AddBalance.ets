@@ -5,8 +5,8 @@ import { promptAction } from '@kit.ArkUI';
 import { BillInfoType } from '../model/BillInfoType';
 import { formatDateToYMD } from '../util/DealTime';
 import axios, { AxiosResponse } from '@ohos/axios';
-import { addForm } from '../util/DealBill';
-import { ap } from '../common/trans';
+import { addForm, updateForm } from '../util/DealBill';
+import { ap, bills, http_url } from '../common/trans';
 
 interface IKeyboardUnit {
     content: string | Resource,
@@ -27,6 +27,7 @@ enum calculateAction {
 @Entry
 @Component
 struct AddBalance {
+
     @State activeYear: number = (router.getParams() as ESObject)['year'];
     @State activeMonth: number = (router.getParams() as ESObject)['month'];
     @State isUpdate: boolean = (router.getParams() as ESObject)['isUpdate']; //判断当前是update还是 add
@@ -35,7 +36,7 @@ struct AddBalance {
     @State activeTab: number = (this.isUpdate) ? (this.updateBillInfo.type > 17 ? 1 : 0) : 0;
     activeTypeRes: Resource = $r("app.media.salaryIcon");
     @State selectedTypeName: string = (this.isUpdate) ? (defaultType[this.updateBillInfo.type].title) : '';
-    @State selectedType : number = -1;
+    @State selectedType :  number = (this.isUpdate) ?this.updateBillInfo.type : -1;
 
     @State balanceAmount: string = (this.isUpdate) ? (this.updateBillInfo.money.toFixed(2)) : "0.00";
     @State calOp: string = "";
@@ -43,7 +44,7 @@ struct AddBalance {
     @State calculateAction: calculateAction = (this.isUpdate) ? calculateAction.input : calculateAction.start;
     @State doneButtonText: string = "√";
     @State activeDay: number = new Date().getDate();
-    activeDate: Date = new Date();
+    activeDate: Date =(this.isUpdate) ?(new Date(this.updateBillInfo.date)): new Date();
     context = getContext(this) as common.UIAbilityContext;
     filesDir = this.context.filesDir;
     @State inputMarginTop: number = (this.isUpdate) ? 0 : 1000; //输入控件的上外边距
@@ -54,7 +55,7 @@ struct AddBalance {
     }
 
     ChangeUnit(number: string): void {
-        if (this.balanceAmount == "0.00") {
+        if (this.balanceAmount == "0.00" || this.balanceAmount == "0") {
             this.balanceAmount = number;
         } else {
             this.balanceAmount += number;
@@ -85,7 +86,7 @@ struct AddBalance {
 
         //这里调用add_data
 
-        axios.post<number, AxiosResponse<number>, addForm>('http://10.0.2.2:5000/api/add', {
+        axios.post<number, AxiosResponse<number>, addForm>(http_url.url_simulator+'5000/api/add', {
             user_name: user_name,
             type: type,
             money: money,
@@ -94,7 +95,6 @@ struct AddBalance {
         })
             .then((response: AxiosResponse) => {
                 console.log("finish!");
-
                 if (response.data['status'] == 200) {
                     console.log("finished!");
                     setTimeout(() => {
@@ -104,10 +104,56 @@ struct AddBalance {
                         })
                     }, 1000)
                 }
+                setTimeout(()=>{
+                    this.ClearInput();
+                    this.inputMarginTop = 1000;
+                    this.inputOpacity = 0;
+                    bills.isChanged = true;
+                },0)
 
-                this.ClearInput();
-                this.inputMarginTop = 1000;
-                this.inputOpacity = 0;
+
+            }
+            )
+
+
+    }
+    UpdateBill(user_name: string|null,
+        id:number,
+        type: number,
+        money: number,
+        content: string,
+        date: string) {
+
+        //这里调用add_data
+
+        axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/update', {
+            user_name: user_name,
+            id: id,
+            type: type,
+            money: money,
+            content: content,
+            date: date
+        })
+            .then((response: AxiosResponse) => {
+                console.log("finish!");
+                if (response.data['status'] == 200) {
+                    console.log("finished!");
+                    setTimeout(() => {
+                        this.getUIContext().getPromptAction().showToast({
+                            message: "修改成功！",
+                            duration: 2000
+                        })
+                    }, 1000)
+                }
+
+
+                    this.ClearInput();
+                    this.inputMarginTop = 1000;
+                    this.inputOpacity = 0;
+                    bills.isChanged = true;
+                this.getUIContext().getRouter().back();
+
+
             }
             )
 
@@ -270,7 +316,7 @@ struct AddBalance {
             {
                 content: "0",
                 callback: () => {
-                    if (this.balanceAmount == "0") {
+                    if (this.balanceAmount == "0" || this.balanceAmount == "0.00") {
                         return;
                     }
                     this.ChangeUnit("0")
@@ -338,7 +384,8 @@ struct AddBalance {
                         return;
                     }
                     if (this.isUpdate) {
-                        //update Bill
+                        this.UpdateBill(ap.account,this.updateBillInfo.id,this.selectedType,parseFloat(this.balanceAmount),this.content,
+                            formatDateToYMD(this.activeDate))
                     } else {
                         this.AddBill(ap.account, this.selectedType, parseFloat(this.balanceAmount), this.content,
                             formatDateToYMD(this.activeDate))
@@ -370,7 +417,7 @@ struct AddBalance {
                             .onClick(() => {
                                 this.activeTab = 0;
                                 this.selectedTypeName = '';
-                                this.balanceAmount = "0";
+                                this.balanceAmount = "0.00";
                             })
                             .border({
                                 width: {
@@ -386,7 +433,7 @@ struct AddBalance {
                             .onClick(() => {
                                 this.activeTab = 1;
                                 this.selectedTypeName = '';
-                                this.balanceAmount = "0";
+                                this.balanceAmount = "0.00";
                             })
                             .border({
                                 width: {

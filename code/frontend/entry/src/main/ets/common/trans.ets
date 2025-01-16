@@ -3,7 +3,7 @@ export class ap{
 }
 
 export class bills{
-  public static flag:boolean = false;
+  public static isChanged:boolean = false;
 }
 
 export class http_url{

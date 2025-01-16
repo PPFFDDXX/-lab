@@ -6,9 +6,9 @@ from datetime import datetime
 app = Flask(__name__)
 
 HOSTNAME = "127.0.0.1"
-PORT = 3306
+PORT = 3307
 USERNAME = "root"
-PASSWORD = "mysql123" # mysql密码   
+PASSWORD = "235813xYf" # mysql密码   
 DATABASE = "harmony"  # 数据库名称
 
 
@@ -175,7 +175,6 @@ def sign():
         print("开始注册")
         # 下面的判断用户已存在存在问题,如需要查看可以注释掉下面两行
         if user_query(user_name, password) != -2:
-            print("用户已存在！")
             return jsonify({"status": -3, "message": "账号已存在"})  # 需要返回 JSON 格式
         print("没有这个用户")
         # 注册用户
@@ -197,7 +196,7 @@ def sign():
 @app.route("/api/get_data/<string:user_name>",methods=['GET'])
 def get_data(user_name):
     #前端获取数据
-    details = DETAIL.query.filter_by(user_name = user_name)
+    details = DETAIL.query.filter_by(user_name = user_name).order_by(DETAIL.date, DETAIL.id)
     
     json = {}
     json["status"] = 200

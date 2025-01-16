@@ -7,8 +7,8 @@ import { BillPage } from '../components/BillPage'
 
 import mediaquery from '@ohos.mediaquery';
 import axios, { AxiosResponse } from '@ohos/axios'
-import { userData } from '../util/DealBill'
-import { ap, http_url } from '../common/trans'
+import { SpliteBillsByDate, userData } from '../util/DealBill'
+import { ap, bills, http_url } from '../common/trans'
 import { http } from '@kit.NetworkKit'
 
 let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
@@ -28,9 +28,14 @@ listener.on('change', onPortrait);
 @Component
 struct Index {
     @State message: string = 'Hello World';
+
+    @State selectedDate: Date = new Date();
+
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
     @State billInfo: BillInfoType[] = [];
+    @State BillsByDate: Map<string, BillInfoType[]> = new Map();
+
     private controller: TabsController = new TabsController();
     @State currentBreakpoint: string = 'md';
     private xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)');
@@ -68,11 +73,11 @@ struct Index {
 
     aboutToAppear(): void {
         // this.billInfo = TempBills;
-        axios.get<number, AxiosResponse<number>, null>(http_url.url_preview+'5000/api/get_data/'+ap.account)
+        axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
             .then((response: AxiosResponse) => {
                 console.log("读取数据");
-                console.log(response.data['data']);
                 this.billInfo = response.data['datas']
+                this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
             }
             )
         this.registerBreakpoint()
@@ -80,9 +85,22 @@ struct Index {
     }
 
     onPageShow(): void {
-        //这里调用函数获取数据吗?还是在登录界面实现
-        //应该是的，这里每次调用接口来获取更新后的数据
-        // this.billInfo = TempBills;
+        let isChanged: boolean = bills.isChanged;
+        if(isChanged){
+            this.getUIContext().getPromptAction().showToast({
+                'message':"重新获取数据",
+                'duration':2000
+            })
+            axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
+                .then((response: AxiosResponse) => {
+                    console.log("读取数据");
+                    console.log(response.data['data']);
+                    this.billInfo = response.data['datas']
+                    this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
+                }
+                )
+            bills.isChanged = false;
+        }
     }
 
     build() {
@@ -96,7 +114,9 @@ struct Index {
 
             TabContent() {
                 BillPage({
-                    billInfo: $billInfo
+                    billInfo: $billInfo,
+                    selectedDate:$selectedDate,
+                    BillsByDate:$BillsByDate
                 })
             }
             .tabBar('明细')
