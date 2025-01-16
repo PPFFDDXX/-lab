@@ -8,7 +8,8 @@ import { BillPage } from '../components/BillPage'
 import mediaquery from '@ohos.mediaquery';
 import axios, { AxiosResponse } from '@ohos/axios'
 import { userData } from '../util/DealBill'
-import { ap } from '../common/trans'
+import { ap, http_url } from '../common/trans'
+import { http } from '@kit.NetworkKit'
 
 let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
 
@@ -67,7 +68,7 @@ struct Index {
 
     aboutToAppear(): void {
         // this.billInfo = TempBills;
-        axios.get<number, AxiosResponse<number>, null>('http://127.0.0.1:5000/api/get_data/'+ap.account)
+        axios.get<number, AxiosResponse<number>, null>(http_url.url_preview+'5000/api/get_data/'+ap.account)
             .then((response: AxiosResponse) => {
                 console.log("读取数据");
                 console.log(response.data['data']);

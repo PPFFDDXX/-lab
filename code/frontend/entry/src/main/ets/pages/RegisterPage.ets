@@ -81,10 +81,10 @@ struct RegisterPage {
                     // })
                     // serve.then(res=>{
                     //   if(res.result&&JSON.parse(res.result as string).code==-3){
-                    //     promptAction.showToast({
-                    //       message:'账号已存在',
-                    //       duration:2000
-                    //     })
+                    //                     //     promptAction.showToast({
+                    //                     //       message:'账号已存在',
+                    //                     //       duration:2000
+                    //                     //     })
                     //     return
                     //   }
                     //   if(res.result&&JSON.parse(res.result as string).code==200){
@@ -96,7 +96,7 @@ struct RegisterPage {
                     //
                     // })
                     
-                    axios.post<number, AxiosResponse<number>, user>('http://127.0.0.1:5000/api/sign', {
+                    axios.post<number, AxiosResponse<number>, user>('http://10.0.2.2:5000/api/sign', {
                         is_sign_up: true,
                         user_name: this.account,
                         password: this.password1

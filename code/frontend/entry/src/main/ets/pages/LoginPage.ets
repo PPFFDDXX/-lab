@@ -1,7 +1,7 @@
 import router from '@ohos.router';
 import { promptAction } from '@kit.ArkUI';
 import http from '@ohos.net.http';
-import { ap } from '../common/trans';
+import { ap, http_url } from '../common/trans';
 import axios, { AxiosResponse } from '@ohos/axios'
 import { user } from './RegisterPage';
 
@@ -100,7 +100,7 @@ struct LauncherPage {
             })
             return
         }
-        axios.post<number, AxiosResponse<number>, user>('http://127.0.0.1:5000/api/sign', {
+        axios.post<number, AxiosResponse<number>, user>(http_url.url_preview+'5000/api/sign', {
             is_sign_up: false,
             user_name: this.account,
             password: this.password
