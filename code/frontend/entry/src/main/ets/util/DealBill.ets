@@ -165,7 +165,7 @@ export async function addData(
     content: string,
     date: string
 ): Promise<number> {
-    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, addForm>(http_url.url_preview+':5000/api/add', {
+    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, addForm>(http_url.url_simulator+'5000/api/add', {
         user_name: userName,
         type: type,
         money: money,
@@ -186,7 +186,7 @@ export async function deleteData(
     content: string,
     date: string
 ): Promise<number> {
-    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_preview+':5000/api/delete', {
+    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
         user_name: userName,
         id: id,
         type: type,
@@ -208,7 +208,7 @@ export async function deleteData(
 //     content: string,
 //     date: string
 // ): Promise<number> {
-//     axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_preview+':5000/api/update', {
+//     axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/update', {
 //         user_name: userName,
 //         id: id,
 //         type: type,
