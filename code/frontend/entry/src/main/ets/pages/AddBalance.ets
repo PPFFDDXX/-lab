@@ -7,6 +7,7 @@ import { formatDateToYMD } from '../util/DealTime';
 import axios, { AxiosResponse } from '@ohos/axios';
 import { addForm } from '../util/DealBill';
 import { ap } from '../common/trans';
+import { http_url } from '../common/trans'
 
 interface IKeyboardUnit {
     content: string | Resource,
@@ -85,7 +86,7 @@ struct AddBalance {
 
         //这里调用add_data
 
-        axios.post<number, AxiosResponse<number>, addForm>('http://10.0.2.2:5000/api/add', {
+        axios.post<number, AxiosResponse<number>, addForm>(http_url.url_simulator+'5000/api/add', {
             user_name: user_name,
             type: type,
             money: money,
