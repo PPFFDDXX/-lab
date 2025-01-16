@@ -91,7 +91,7 @@ export struct BalanceViewer {
                             }
                         });
                     })
-                    .backgroundColor(Color.White)
+                    .backgroundColor('#AAAAF0')
                     .width('100%')
                     .borderRadius(4)
                 }
@@ -121,7 +121,6 @@ export struct BalanceViewer {
             }
             .height(60)
             .width('100%')
-            .backgroundColor(Color.White)
             .padding({
                 top: 0,
                 left: 8,

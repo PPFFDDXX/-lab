@@ -81,7 +81,6 @@ export struct BillPage {
                 }
                 .padding(24)
                 .width('100%')
-                .backgroundColor(Color.White)
 
                 BalanceViewer({
                     selectedDate: $selectedDate,
@@ -92,8 +91,7 @@ export struct BillPage {
                 })
             }
             .width('100%')
-            .backgroundColor(Color.White)
-
+            .backgroundColor('#AAAAF0')
             FunctionSelect({
                 selectedDate: $selectedDate,
                 billInfo: $billInfo
@@ -115,38 +113,63 @@ export struct BillPage {
                 .height('70%')
                 .justifyContent(FlexAlign.Center)
                 .alignItems(HorizontalAlign.Center)
+                .width('100%')
+                .borderRadius({ topLeft: 20, topRight: 20 })
+                .backgroundColor(Color.White)
+                .padding({ bottom:100 })
 
             } else {
-                List() {
-                    ForEach(Array.from(this.BillsByDate.entries()), (item: [date: string, bills: BillInfoType[]]) => {
-                        ListItem() {
-                            // 日期标题
-                            Column() {
-                                Row() {
-                                    Text(item[0])
-                                        .fontColor(Color.Black)
-                                        .fontSize(12)
-                                        .fontWeight(FontWeight.Normal)
-                                        .padding(8)
+                // Scroll() {
+                    List() {
+                        ForEach(Array.from(this.BillsByDate.entries()),
+                            (item: [date: string, bills: BillInfoType[]]) => {
+                                ListItem() {
+                                    // 日期标题
+                                    Column() {
+                                        Row() {
+                                            Text(item[0])
+                                                .fontColor(Color.Black)
+                                                .fontSize(12)
+                                                .fontWeight(FontWeight.Normal)
+                                                .padding(8)
 
+                                        }
+                                        .width('100%')
+                                        .justifyContent(FlexAlign.Start)
+
+                                        Divider().strokeWidth(0.7)
+                                        // 渲染分组账单
+                                        this.BillDateList(item[1]);
+                                    }
+                                    .width('100%')
                                 }
                                 .width('100%')
-                                .justifyContent(FlexAlign.Start)
+                            })
+                    }
+                    .width('97%')
+                    .height('67%')
+                    .borderRadius({ topLeft: 20, topRight: 20 })
+                    .backgroundColor(Color.White)
 
-                                // 渲染分组账单
-                                this.BillDateList(item[1]);
-                            }
-                            .width('100%')
-                        }
-                        .width('100%')
-                    })
-                }
-                .scrollBar(BarState.Auto)
-                .width('100%')
+                    //.padding({ bottom:200 })
+                // }
+                // .scrollBar(BarState.Auto)
+                // .width('97%')
+                // .height(478)
+                // .height('67%')
+                // .borderRadius({ topLeft: 20, topRight: 20 })
+                // .backgroundColor(Color.White)
+                // .scrollable(ScrollDirection.Vertical) // 竖直滚动
+                // .scrollBarColor('#DCDCDC')          // 设置滚动条颜色
+                // .scrollBarWidth(2.5)                   // 设置滚动条宽度
+                // .scrollBar(BarState.Auto)               // 设置滚动条永久显示
             }
 
         }
-        .height('90%')
+        .width('100%')
+        .height('100%')
+        .backgroundColor('#AAAAF0')
+        .borderRadius({ topLeft: 50, topRight: 50 })
     }
 
     @Builder
@@ -156,7 +179,11 @@ export struct BillPage {
                 Row({space:12}) {
                     Image(defaultType[billInfo.type].img)
                         .padding(8)
-                        .size({ height: 32, width: 32 })
+                        .size({ height: 36, width: 36 })
+                        .borderRadius(8)
+                        .padding(8)
+                        .backgroundColor(isExpense(billInfo)?'#ffe2effd':'#ffe2ef')
+                        .margin({ right: 16 })
                     Text(defaultType[billInfo.type].title)
                         .fontSize(12)
                 }
@@ -164,9 +191,12 @@ export struct BillPage {
                     .fontColor(Color.Black)
                     .fontSize(12)
                     .fontWeight(FontWeight.Bold)
+                    .margin({ right: 16 })
             }
             .margin({left:16,right:16})
             .width('90%')
+            .borderRadius(8)
+            .backgroundColor('#F5F5F5')
             .justifyContent(FlexAlign.SpaceBetween)
             .gesture(LongPressGesture({ repeat: true })
                 // 这里是长按调用
@@ -254,7 +284,7 @@ export struct BillPage {
                 }
             },)
         }
-        .borderWidth({ bottom: 1 })
+        .borderWidth({ bottom: 1 ,top:5})
         .borderColor(Color.White)
 
     }
