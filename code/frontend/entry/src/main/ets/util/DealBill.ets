@@ -150,7 +150,7 @@ export function CalBill(BillsByDate:Map<string, BillInfoType[]>):[ number,number
     return [totalExpense,totalIncome];
 }
 
-@Concurrent
+// @Concurrent
 export function CalExpense(BillInfos:BillInfoType[]):number {
     let totalExpense = 0;
     BillInfos.forEach((bill)=>{
@@ -159,7 +159,7 @@ export function CalExpense(BillInfos:BillInfoType[]):number {
     return totalExpense;
 }
 
-@Concurrent
+// @Concurrent
 export function CalIncome(BillInfos:BillInfoType[]):number {
     let totalIncome = 0;
     BillInfos.forEach((bill)=>{
@@ -168,7 +168,7 @@ export function CalIncome(BillInfos:BillInfoType[]):number {
     return totalIncome;
 }
 
-@Concurrent
+// @Concurrent
 export function CalLeft(BillInfos:BillInfoType[]):number {
     let totalLeft = 0;
     BillInfos.forEach((bill)=>{
