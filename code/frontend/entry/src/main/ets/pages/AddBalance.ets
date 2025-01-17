@@ -269,7 +269,7 @@ struct AddBalance {
                 }
             },
             {
-                content: "今天",
+                content: "日期",
                 callback: () => {
                     DatePickerDialog.show({
                         start: new Date("2000-01-01"),

@@ -8,7 +8,11 @@ app = Flask(__name__)
 HOSTNAME = "127.0.0.1" # 数据库host
 PORT = 3306 # 数据库端口号
 USERNAME = "root" # 用户名
+<<<<<<< HEAD
 PASSWORD = "vanish198115" # mysql密码   
+=======
+PASSWORD = "mysql" # mysql密码   
+>>>>>>> 08fd07169a1e34f41ab7562f1c25813fbbb395ac
 DATABASE = "harmony"  # 数据库名称
 
 
