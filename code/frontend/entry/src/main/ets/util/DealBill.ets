@@ -6,6 +6,7 @@ import {BillInfoType} from '../model/BillInfoType'
 import { FormatDate, Translate } from './DealTime';
 import axios, { AxiosResponse } from '@ohos/axios'
 import {http_url} from '../common/trans'
+import { taskpool } from '@kit.ArkTS';
 
 
 /*
@@ -22,7 +23,7 @@ export function isExpense(billinfo:BillInfoType):boolean {
 * 用处是在明细界面的UI展示
  */
 
-export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date): Map<string, BillInfoType[]> {
+export async function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date): Promise<Map<string, BillInfoType[]>> {
     const groupedBills: Map<string, BillInfoType[]> = new Map();
 
     if(billinfos == null || billinfos.length == 0){
@@ -32,22 +33,41 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
     const selectedMon: number = selectedDate.getMonth() + 1;
     const selectedYear: number = selectedDate.getFullYear();
 
+    let tasks: taskpool.Task[] = []
+
     billinfos.forEach(bill => {
         const date = bill.date; //  date 是字符串，格式为 'YYYY-MM-DD'
         const month = new Date(date).getMonth() + 1;
         const year = new Date(date).getFullYear();
 
-        if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
-            groupedBills.set(date, []);
-        }
-        if (groupedBills.has(date)) {
-            groupedBills.get(date)!.push(bill);
-        } else {
-            console.error(`Date ${date} was not initialized correctly.`);
-        }
+        // if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
+        //     groupedBills.set(date, []);
+        // }
+        // if (groupedBills.has(date)) {
+        //     groupedBills.get(date)!.push(bill);
+        // } else {
+        //     console.error(`Date ${date} was not initialized correctly.`);
+        // }
+
+        let task: taskpool.Task = new taskpool.Task(spliteByDate, bill, selectedMon, selectedYear, month, year, groupedBills, date);
+        tasks.push(task);
     });
 
+    tasks.forEach(task => {taskpool.execute(task)});
+
     return groupedBills;
+}
+
+@Concurrent
+function spliteByDate (bill: BillInfoType, selectedMon: number, selectedYear: number, month: number, year: number, groupedBills: Map<string, BillInfoType[]>, date: string) {
+    if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
+        groupedBills.set(date, []);
+    }
+    if (groupedBills.has(date)) {
+        groupedBills.get(date)!.push(bill);
+    } else {
+        console.error(`Date ${date} was not initialized correctly.`);
+    }
 }
 
 
@@ -56,29 +76,48 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
 * 用处是在账单界面的UI展示
  */
 
-export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date): Map<number, BillInfoType[]> {
+export async function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date): Promise<Map<number, BillInfoType[]>> {
     const groupedBills: Map<number, BillInfoType[]> = new Map();
     if(billinfos == null){
         return groupedBills;
     }
     const selectedYear: number = selectedDate.getFullYear();
 
+    let tasks: taskpool.Task[] = []
+
     billinfos.forEach(bill => {
         const date = bill.date; //  date 是字符串，格式为 'YYYY-MM-DD'
         const month = new Date(date).getMonth() + 1;
         const year = new Date(date).getFullYear();
 
-        if (year == selectedYear  && !groupedBills.has(month) ) {
-            groupedBills.set(month, []);
-        }
-        if (groupedBills.has(month)) {
-            groupedBills.get(month)!.push(bill);
-        } else {
-            console.error(`Date ${month} was not initialized correctly.`);
-        }
+        // if (year == selectedYear  && !groupedBills.has(month) ) {
+        //     groupedBills.set(month, []);
+        // }
+        // if (groupedBills.has(month)) {
+        //     groupedBills.get(month)!.push(bill);
+        // } else {
+        //     console.error(`Date ${month} was not initialized correctly.`);
+        // }
+
+        let task: taskpool.Task = new taskpool.Task(spliteByMon, bill, selectedYear, month, year, groupedBills, date);
+        tasks.push(task);
     });
 
+    tasks.forEach(task => {taskpool.execute(task)});
+
     return groupedBills;
+}
+
+@Concurrent
+function spliteByMon(bill: BillInfoType, selectedYear: number, month: number, year: number, groupedBills: Map<number, BillInfoType[]>, date: string) {
+    if (year == selectedYear  && !groupedBills.has(month) ) {
+        groupedBills.set(month, []);
+    }
+    if (groupedBills.has(month)) {
+        groupedBills.get(month)!.push(bill);
+    } else {
+        console.error(`Date ${month} was not initialized correctly.`);
+    }
 }
 
 
