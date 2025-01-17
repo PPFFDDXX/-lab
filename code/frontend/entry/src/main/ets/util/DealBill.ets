@@ -76,7 +76,7 @@ function spliteByDate (bill: BillInfoType, selectedMon: number, selectedYear: nu
 * 用处是在账单界面的UI展示
  */
 
-export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date): Map<number, BillInfoType[]> {
+export async function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date): Promise<Map<number, BillInfoType[]>> {
     const groupedBills: Map<number, BillInfoType[]> = new Map();
     if(billinfos == null){
         return groupedBills;
