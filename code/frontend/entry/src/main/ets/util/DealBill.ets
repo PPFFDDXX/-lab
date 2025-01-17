@@ -29,13 +29,13 @@ export function concurrentRegister(index_params: IndexParams2) {
         if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'xs'
     }
     if (index_params.smListener.matches) {
-        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'sm'
+        if (index_params.currentBreakpoint != 'sm') index_params.currentBreakpoint = 'sm'
     }
     if (index_params.mdListener.matches) {
-        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'md'
+        if (index_params.currentBreakpoint != 'md') index_params.currentBreakpoint = 'md'
     }
     if (index_params.lgListener.matches) {
-        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'lg'
+        if (index_params.currentBreakpoint != 'lg') index_params.currentBreakpoint = 'lg'
     }
 }
 
