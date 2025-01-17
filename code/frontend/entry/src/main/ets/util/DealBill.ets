@@ -40,35 +40,35 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
         const month = new Date(date).getMonth() + 1;
         const year = new Date(date).getFullYear();
 
-        // if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
-        //     groupedBills.set(date, []);
-        // }
-        // if (groupedBills.has(date)) {
-        //     groupedBills.get(date)!.push(bill);
-        // } else {
-        //     console.error(`Date ${date} was not initialized correctly.`);
-        // }
+        if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
+            groupedBills.set(date, []);
+        }
+        if (groupedBills.has(date)) {
+            groupedBills.get(date)!.push(bill);
+        } else {
+            console.error(`Date ${date} was not initialized correctly.`);
+        }
 
-        let task: taskpool.Task = new taskpool.Task(spliteByDate, bill, selectedMon, selectedYear, month, year, groupedBills, date);
-        tasks.push(task);
+        // let task: taskpool.Task = new taskpool.Task(spliteByDate, bill, selectedMon, selectedYear, month, year, groupedBills, date);
+        // tasks.push(task);
     });
 
-    tasks.forEach(task => {taskpool.execute(task)});
+    // tasks.forEach(task => {taskpool.execute(task)});
 
     return groupedBills;
 }
 
-@Concurrent
-function spliteByDate (bill: BillInfoType, selectedMon: number, selectedYear: number, month: number, year: number, groupedBills: Map<string, BillInfoType[]>, date: string) {
-    if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
-        groupedBills.set(date, []);
-    }
-    if (groupedBills.has(date)) {
-        groupedBills.get(date)!.push(bill);
-    } else {
-        console.error(`Date ${date} was not initialized correctly.`);
-    }
-}
+// @Concurrent
+// function spliteByDate (bill: BillInfoType, selectedMon: number, selectedYear: number, month: number, year: number, groupedBills: Map<string, BillInfoType[]>, date: string) {
+//     if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
+//         groupedBills.set(date, []);
+//     }
+//     if (groupedBills.has(date)) {
+//         groupedBills.get(date)!.push(bill);
+//     } else {
+//         console.error(`Date ${date} was not initialized correctly.`);
+//     }
+// }
 
 
 /*
@@ -90,35 +90,35 @@ export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date):
         const month = new Date(date).getMonth() + 1;
         const year = new Date(date).getFullYear();
 
-        // if (year == selectedYear  && !groupedBills.has(month) ) {
-        //     groupedBills.set(month, []);
-        // }
-        // if (groupedBills.has(month)) {
-        //     groupedBills.get(month)!.push(bill);
-        // } else {
-        //     console.error(`Date ${month} was not initialized correctly.`);
-        // }
+        if (year == selectedYear  && !groupedBills.has(month) ) {
+            groupedBills.set(month, []);
+        }
+        if (groupedBills.has(month)) {
+            groupedBills.get(month)!.push(bill);
+        } else {
+            console.error(`Date ${month} was not initialized correctly.`);
+        }
 
-        let task: taskpool.Task = new taskpool.Task(spliteByMon, bill, selectedYear, month, year, groupedBills, date);
-        tasks.push(task);
+        // let task: taskpool.Task = new taskpool.Task(spliteByMon, bill, selectedYear, month, year, groupedBills, date);
+        // tasks.push(task);
     });
 
-    tasks.forEach(task => {taskpool.execute(task)});
+    // tasks.forEach(task => {taskpool.execute(task)});
 
     return groupedBills;
 }
 
-@Concurrent
-function spliteByMon(bill: BillInfoType, selectedYear: number, month: number, year: number, groupedBills: Map<number, BillInfoType[]>, date: string) {
-    if (year == selectedYear  && !groupedBills.has(month) ) {
-        groupedBills.set(month, []);
-    }
-    if (groupedBills.has(month)) {
-        groupedBills.get(month)!.push(bill);
-    } else {
-        console.error(`Date ${month} was not initialized correctly.`);
-    }
-}
+// @Concurrent
+// function spliteByMon(bill: BillInfoType, selectedYear: number, month: number, year: number, groupedBills: Map<number, BillInfoType[]>, date: string) {
+//     if (year == selectedYear  && !groupedBills.has(month) ) {
+//         groupedBills.set(month, []);
+//     }
+//     if (groupedBills.has(month)) {
+//         groupedBills.get(month)!.push(bill);
+//     } else {
+//         console.error(`Date ${month} was not initialized correctly.`);
+//     }
+// }
 
 
 /*
@@ -197,47 +197,47 @@ export interface updateForm {
 
 
 
-export async function addData(
-    userName: string,
-    type: number,
-    money: number,
-    content: string,
-    date: string
-): Promise<number> {
-    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, addForm>(http_url.url_simulator+'5000/api/add', {
-        user_name: userName,
-        type: type,
-        money: money,
-        content: content,
-        date: date
-    })
-    if (response.data['status'] == 200) {
-        console.log('成功存入')
-    }
-    return response.data['status']
-}
+// export async function addData(
+//     userName: string,
+//     type: number,
+//     money: number,
+//     content: string,
+//     date: string
+// ): Promise<number> {
+//     const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, addForm>(http_url.url_simulator+'5000/api/add', {
+//         user_name: userName,
+//         type: type,
+//         money: money,
+//         content: content,
+//         date: date
+//     })
+//     if (response.data['status'] == 200) {
+//         console.log('成功存入')
+//     }
+//     return response.data['status']
+// }
 
-export async function deleteData(
-    userName: string,
-    id: number,
-    type: number,
-    money: number,
-    content: string,
-    date: string
-): Promise<number> {
-    const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
-        user_name: userName,
-        id: id,
-        type: type,
-        money: money,
-        content: content,
-        date: date
-    })
-    if (response.data['status'] == 200) {
-        console.log('成功删除')
-    }
-    return response.data['status']
-}
+// export async function deleteData(
+//     userName: string,
+//     id: number,
+//     type: number,
+//     money: number,
+//     content: string,
+//     date: string
+// ): Promise<number> {
+//     const response: AxiosResponse = await axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
+//         user_name: userName,
+//         id: id,
+//         type: type,
+//         money: money,
+//         content: content,
+//         date: date
+//     })
+//     if (response.data['status'] == 200) {
+//         console.log('成功删除')
+//     }
+//     return response.data['status']
+// }
 
 // export async function updateData(
 //     userName: string,
