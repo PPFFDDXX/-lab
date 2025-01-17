@@ -63,7 +63,7 @@ export struct ProfilePage{
       .backgroundBlurStyle(BlurStyle.Regular)
 
       Column({space:10}){
-        this.mineItemBuilder($r('app.media.ic_mine_team'),'开发团队','前端成员：aaa，bbb，ccc，ddd\n后端成员：aaa，bbb，ccc')
+        this.mineItemBuilder($r('app.media.ic_mine_team'),'开发团队','前端成员：xyf，wy，wzd，ysy\n后端成员：zbc，xqx，hxy')
         Divider()
         this.mineItemBuilder($r('app.media.ic_mine_update'),'检查更新','已是最新版本')
         Divider()

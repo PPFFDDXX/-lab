@@ -77,7 +77,6 @@ export struct BalanceViewer {
                             start: new Date(`2000-01-01`),
                             selected: this.selectedDate,
                             onAccept: (v) => {
-
                                 this.selectedDate.setFullYear(v.year, v.month, v.day);
                                 if (this.billInfo.length == 0) {
                                     promptAction.showToast({

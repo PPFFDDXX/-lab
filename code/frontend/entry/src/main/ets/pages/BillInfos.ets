@@ -9,7 +9,7 @@ interface reNumber{
     yearlyExpense:number
 }
 
-@Concurrent
+@Concurrent//多线程部分
 function calMoney(billInfo:BillInfoType[]):reNumber {
     let yearlyExpense: number = 0;
     let yearlyIncome: number = 0;

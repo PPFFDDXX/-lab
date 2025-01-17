@@ -4,7 +4,7 @@ import { BillInfoType } from '../model/BillInfoType'
 
 import { defaultType} from '../model/BillType'
 
-import { isExpense, SpliteBillsByDate, updateForm } from '../util/DealBill'
+import { CalBill, isExpense, SpliteBillsByDate, updateForm } from '../util/DealBill'
 
 import { promptAction, router } from '@kit.ArkUI';
 import { CommonConstants } from '../common/CommonConstants'
@@ -38,7 +38,9 @@ export struct BillPage {
             this.billInfo.splice(index, 1);
             this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
             this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
-
+            const Obj:[number,number] = CalBill(this.BillsByDate);
+            this.totalBalance = Obj[0];
+            this.totalIncome = Obj[1];
             axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
                 user_name: bill.user_name,
                 id: bill.id,
