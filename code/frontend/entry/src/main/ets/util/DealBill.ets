@@ -24,19 +24,22 @@ export class IndexParams2 {
 }
 
 @Concurrent
-export function concurrentRegister(index_params: IndexParams2) {
-    if (index_params.xsListener.matches) {
-        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'xs'
+export function concurrentRegister(xsListener: mediaquery.MediaQueryListener, smListener: mediaquery.MediaQueryListener, mdListener: mediaquery.MediaQueryListener, lgListener: mediaquery.MediaQueryListener, currentBreakpoint: string): string {
+    let res: string = ''
+    if (xsListener.matches) {
+        if (currentBreakpoint != 'xs') res = 'xs'
     }
-    if (index_params.smListener.matches) {
-        if (index_params.currentBreakpoint != 'sm') index_params.currentBreakpoint = 'sm'
+    if (smListener.matches) {
+        if (currentBreakpoint != 'sm') res = 'sm'
     }
-    if (index_params.mdListener.matches) {
-        if (index_params.currentBreakpoint != 'md') index_params.currentBreakpoint = 'md'
+    if (mdListener.matches) {
+        if (currentBreakpoint != 'md') res = 'md'
     }
-    if (index_params.lgListener.matches) {
-        if (index_params.currentBreakpoint != 'lg') index_params.currentBreakpoint = 'lg'
+    if (lgListener.matches) {
+        if (currentBreakpoint != 'lg') res = 'lg'
     }
+
+    return res
 }
 
 /*

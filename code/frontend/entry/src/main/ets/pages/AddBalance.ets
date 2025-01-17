@@ -35,12 +35,12 @@ enum calculateAction {
 
 
 @Concurrent
-export function getData(index_params: IndexParams1) {
+export function getData(billInfo: BillInfoType[], BillsByDate: Map<string, BillInfoType[]>, selectedDate: Date) {
     axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
         .then((response: AxiosResponse) => {
             console.log("读取数据");
-            index_params.billInfo = response.data['datas']
-            index_params.BillsByDate = SpliteBillsByDate(index_params.billInfo, index_params.selectedDate);
+            billInfo = response.data['datas']
+            BillsByDate = SpliteBillsByDate(billInfo, selectedDate);
         }
     )
 }

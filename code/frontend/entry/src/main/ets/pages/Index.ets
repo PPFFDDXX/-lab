@@ -30,55 +30,55 @@ listener.on('change', onPortrait);
 struct Index {
     @State message: string = 'Hello World';
 
-    @State index_params1: IndexParams1 = new IndexParams1();
-    @State index_params2: IndexParams2 = new IndexParams2();
+    // @State index_params1: IndexParams1 = new IndexParams1();
+    // @State index_params2: IndexParams2 = new IndexParams2();
 
-    // @State selectedDate: Date = new Date();
+    @State selectedDate: Date = new Date();
 
     @State totalIncome: number = 0;
     @State totalBalance: number = 0;
 
     @State selectedIndex: number = 0;
     @State tabsInfo: TabBarClass[] = TAB_INFO;
-    // @State billInfo: BillInfoType[] = [];
-    // @State BillsByDate: Map<string, BillInfoType[]> = new Map();
+    @State billInfo: BillInfoType[] = [];
+    @State BillsByDate: Map<string, BillInfoType[]> = new Map();
 
     private controller: TabsController = new TabsController();
-    // @State currentBreakpoint: string = 'md';
-    // private xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)');
-    // private smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)');
-    // private mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)');
-    // private lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)');
+    @State currentBreakpoint: string = 'md';
+    private xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)');
+    private smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)');
+    private mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)');
+    private lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)');
 
     registerBreakpoint() {
-        if (this.index_params2.xsListener.matches) {
+        if (this.xsListener.matches) {
             this.updateCurrentBreakpoint('xs')
         }
 
-        if (this.index_params2.smListener.matches) {
+        if (this.smListener.matches) {
             this.updateCurrentBreakpoint('sm')
         }
 
-        if (this.index_params2.mdListener.matches) {
+        if (this.mdListener.matches) {
             this.updateCurrentBreakpoint('md')
         }
 
-        if (this.index_params2.lgListener.matches) {
+        if (this.lgListener.matches) {
             this.updateCurrentBreakpoint('lg')
         }
 
     }
 
     updateCurrentBreakpoint(breakpoint: string) {
-        if (this.index_params2.currentBreakpoint !== breakpoint) {
-            this.index_params2.currentBreakpoint = breakpoint;
+        if (this.currentBreakpoint !== breakpoint) {
+            this.currentBreakpoint = breakpoint;
         }
     }
 
     onPageHide(): void {
     }
 
-    aboutToAppear(): void {
+    async aboutToAppear(): Promise<void> {
         // this.billInfo = TempBills;
         // axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
         //     .then((response: AxiosResponse) => {
@@ -88,11 +88,11 @@ struct Index {
         //     }
         //     )
         // this.registerBreakpoint()
-        let task1: taskpool.Task = new taskpool.Task(getData, this.index_params1)
-        let task2: taskpool.Task = new taskpool.Task(concurrentRegister, this.index_params2)
+        let task1: taskpool.Task = new taskpool.Task(getData, this.billInfo, this.BillsByDate, this.selectedDate)
+        let task2: taskpool.Task = new taskpool.Task(concurrentRegister, this.xsListener, this.smListener, this.mdListener, this.lgListener, this.currentBreakpoint)
 
-        taskpool.execute(task1)
-        taskpool.execute(task2)
+        this.BillsByDate = new Map(Object.entries(await taskpool.execute(task1)))
+        this.updateCurrentBreakpoint(String(await taskpool.execute(task2)))
     }
 
     onPageShow(): void {
@@ -106,9 +106,9 @@ struct Index {
                 .then((response: AxiosResponse) => {
                     console.log("读取数据");
                     console.log(response.data['data']);
-                    this.index_params1.billInfo = response.data['datas']
-                    this.index_params1.BillsByDate = SpliteBillsByDate(this.index_params1.billInfo,this.index_params1.selectedDate);
-                    const Obj:[number,number] = CalBill(this.index_params1.BillsByDate);
+                    this.billInfo = response.data['datas']
+                    this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
+                    const Obj:[number,number] = CalBill(this.BillsByDate);
                     this.totalBalance = Obj[0];
                     this.totalIncome = Obj[1];
                 }
@@ -120,7 +120,7 @@ struct Index {
     build() {
 
 
-        Tabs({ barPosition: this.index_params2.currentBreakpoint == 'lg' ? BarPosition.Start : BarPosition.End }) {
+        Tabs({ barPosition: this.currentBreakpoint == 'lg' ? BarPosition.Start : BarPosition.End }) {
             TabContent() {
                 BillPage({
                     billInfo: $billInfo,
@@ -138,8 +138,8 @@ struct Index {
             }
             .tabBar("我的")
         }
-        .vertical(this.index_params2.currentBreakpoint == 'lg' ? true : false)
-        .barWidth(this.index_params2.currentBreakpoint == 'lg' ? 100 : '')
-        .barHeight(this.index_params2.currentBreakpoint == 'lg' ? 200 : '')
+        .vertical(this.currentBreakpoint == 'lg' ? true : false)
+        .barWidth(this.currentBreakpoint == 'lg' ? 100 : '')
+        .barHeight(this.currentBreakpoint == 'lg' ? 200 : '')
     }
 }
