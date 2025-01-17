@@ -6,7 +6,7 @@ import { BillInfoType } from '../model/BillInfoType';
 import { formatDateToYMD } from '../util/DealTime';
 import axios, { AxiosResponse } from '@ohos/axios';
 
-import { addForm, updateForm } from '../util/DealBill';
+import { addForm, updateForm, SpliteBillsByDate, IndexParams } from '../util/DealBill';
 import { ap, bills, http_url } from '../common/trans';
 
 
@@ -31,6 +31,18 @@ enum calculateAction {
     input,
     precal,
     cal
+}
+
+
+@Concurrent
+export function getData(index_params: IndexParams) {
+    axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
+        .then((response: AxiosResponse) => {
+            console.log("读取数据");
+            index_params.billInfo = response.data['datas']
+            index_params.BillsByDate = SpliteBillsByDate(index_params.billInfo, index_params.selectedDate);
+        }
+    )
 }
 
 @Concurrent

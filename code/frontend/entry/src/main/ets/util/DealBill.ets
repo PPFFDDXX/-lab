@@ -6,8 +6,35 @@ import {BillInfoType} from '../model/BillInfoType'
 import { FormatDate, Translate } from './DealTime';
 import axios, { AxiosResponse } from '@ohos/axios'
 import {http_url} from '../common/trans'
-import { taskpool } from '@kit.ArkTS';
+import { taskpool } from '@kit.ArkTS'
+import mediaquery from '@ohos.mediaquery'
 
+export class IndexParams {
+    billInfo: BillInfoType[] = []
+    BillsByDate: Map<string, BillInfoType[]> = new Map()
+    currentBreakpoint: string = 'md'
+    xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)')
+    smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)')
+    mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)')
+    lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)')
+    selectedDate: Date = new Date()
+}
+
+@Concurrent
+export function concurrentRegister(index_params: IndexParams) {
+    if (index_params.xsListener.matches) {
+        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'xs'
+    }
+    if (index_params.smListener.matches) {
+        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'sm'
+    }
+    if (index_params.mdListener.matches) {
+        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'md'
+    }
+    if (index_params.lgListener.matches) {
+        if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'lg'
+    }
+}
 
 /*
 *   由于判断支出收入的数据定义暂时还未确定
@@ -58,19 +85,6 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
     return groupedBills;
 }
 
-// @Concurrent
-// function spliteByDate (bill: BillInfoType, selectedMon: number, selectedYear: number, month: number, year: number, groupedBills: Map<string, BillInfoType[]>, date: string) {
-//     if (year == selectedYear && month === selectedMon && !groupedBills.has(date) ) {
-//         groupedBills.set(date, []);
-//     }
-//     if (groupedBills.has(date)) {
-//         groupedBills.get(date)!.push(bill);
-//     } else {
-//         console.error(`Date ${date} was not initialized correctly.`);
-//     }
-// }
-
-
 /*
 * 这是一个将账单信息数组转换为map<mon:number,账单信息[]>的函数
 * 用处是在账单界面的UI展示
@@ -107,19 +121,6 @@ export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date):
 
     return groupedBills;
 }
-
-// @Concurrent
-// function spliteByMon(bill: BillInfoType, selectedYear: number, month: number, year: number, groupedBills: Map<number, BillInfoType[]>, date: string) {
-//     if (year == selectedYear  && !groupedBills.has(month) ) {
-//         groupedBills.set(month, []);
-//     }
-//     if (groupedBills.has(month)) {
-//         groupedBills.get(month)!.push(bill);
-//     } else {
-//         console.error(`Date ${month} was not initialized correctly.`);
-//     }
-// }
-
 
 /*
 * 这是一个计算当月支出和收入的函数

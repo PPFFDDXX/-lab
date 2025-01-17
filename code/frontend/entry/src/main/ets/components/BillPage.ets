@@ -37,6 +37,7 @@ export struct BillPage {
         if (index > -1) {
             this.billInfo.splice(index, 1);
             this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
+            this.BillsByDate = SpliteBillsByDate(this.billInfo, this.selectedDate);
 
             axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/delete', {
                 user_name: bill.user_name,
