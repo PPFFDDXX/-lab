@@ -3,7 +3,7 @@ import { CalExpense, CalIncome, CalLeft, isExpense, SpliteBillsByMon } from '../
 import { router } from '@kit.ArkUI';
 import { taskpool } from '@kit.ArkTS'
 
-async function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>){
+function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>){
     let i: number = 0
     for (let item of Array.from(BillsByMon.entries())) {
         let task1: taskpool.Task = new taskpool.Task(CalIncome, item[1])
@@ -11,9 +11,20 @@ async function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<nu
         let task3: taskpool.Task = new taskpool.Task(CalLeft, item[1])
 
         calRes[i][0] = item[0]
-        calRes[i][1] = Number(await taskpool.execute(task1))
-        calRes[i][2] = Number(await taskpool.execute(task2))
-        calRes[i][3] = Number(await taskpool.execute(task3))
+        taskpool.execute(task1).then(res1 => {
+            calRes[i][1] = Number(res1)
+        })
+        taskpool.execute(task2).then(res2 => {
+            calRes[i][2] = Number(res2)
+        })
+        taskpool.execute(task3).then(res3 => {
+            calRes[i][3] = Number(res3)
+        })
+
+        // calRes[i][0] = item[0]
+        // calRes[i][1] = CalIncome(item[1])
+        // calRes[i][2] = CalExpense(item[1])
+        // calRes[i][3] = CalLeft(item[1])
 
         i++
     }
@@ -43,10 +54,11 @@ struct BillInfos {
         this.yearlyLeft = this.yearlyIncome - this.yearlyExpense;
     }
 
-    aboutToAppear(): void {
+    async aboutToAppear() {
         let tmp: number = 0
         for (let item of Array.from(this.BillsByMon.entries())) {
             this.calRes.push(new Array<number>())
+            this.calRes[tmp].push(0)
             this.calRes[tmp].push(0)
             this.calRes[tmp].push(0)
             this.calRes[tmp].push(0)
