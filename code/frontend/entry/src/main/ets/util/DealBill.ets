@@ -9,19 +9,22 @@ import {http_url} from '../common/trans'
 import { taskpool } from '@kit.ArkTS'
 import mediaquery from '@ohos.mediaquery'
 
-export class IndexParams {
+export class IndexParams1 {
     billInfo: BillInfoType[] = []
     BillsByDate: Map<string, BillInfoType[]> = new Map()
+    selectedDate: Date = new Date()
+}
+
+export class IndexParams2 {
     currentBreakpoint: string = 'md'
     xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)')
     smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)')
     mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)')
     lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)')
-    selectedDate: Date = new Date()
 }
 
 @Concurrent
-export function concurrentRegister(index_params: IndexParams) {
+export function concurrentRegister(index_params: IndexParams2) {
     if (index_params.xsListener.matches) {
         if (index_params.currentBreakpoint != 'xs') index_params.currentBreakpoint = 'xs'
     }
