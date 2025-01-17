@@ -3,66 +3,29 @@ import { CalExpense, CalIncome, CalLeft, isExpense, SpliteBillsByMon } from '../
 import { router } from '@kit.ArkUI';
 import { taskpool } from '@kit.ArkTS'
 
-// async function CalculateIncome(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>) {
-//     let i: number = 0
-//     for (let item of Array.from(BillsByMon.entries())) {
-//         let task: taskpool.Task = new taskpool.Task(CalIncome, item[1])
-//
-//         calRes[i][0] = item[0]
-//         taskpool.execute(task).then(res => {
-//             calRes[i][1] = Number(res)
-//         })
-//         i++
-//     }
-// }
-//
-// async function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>) {
-//     let i: number = 0
-//     for (let item of Array.from(BillsByMon.entries())) {
-//         let task: taskpool.Task = new taskpool.Task(CalExpense, item[1])
-//
-//         taskpool.execute(task).then(res => {
-//             calRes[i][2] = Number(res)
-//         })
-//         i++
-//     }
-// }
-//
-// async function CalculateLeft(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>) {
-//     let i: number = 0
-//     for (let item of Array.from(BillsByMon.entries())) {
-//         let task: taskpool.Task = new taskpool.Task(CalLeft, item[1])
-//
-//         taskpool.execute(task).then(res => {
-//             calRes[i][3] = Number(res)
-//         })
-//         i++
-//     }
-// }
+interface reNumber{
+    yearlyLeft:number ,
+    yearlyIncome:number ,
+    yearlyExpense:number
+}
 
-// function CalculateAll(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>){
-//     for (let item of Array.from(BillsByMon.entries())) {
-//         // let task1: taskpool.Task = new taskpool.Task(CalIncome, item[1])
-//         // let task2: taskpool.Task = new taskpool.Task(CalExpense, item[1])
-//         // let task3: taskpool.Task = new taskpool.Task(CalLeft, item[1])
-//
-//         // taskpool.execute(task1).then(res1 => {
-//         //     calRes[i][1] = Number(res1)
-//         // })
-//         // taskpool.execute(task2).then(res2 => {
-//         //     calRes[i][2] = Number(res2)
-//         // })
-//         // taskpool.execute(task3).then(res3 => {
-//         //     calRes[i][3] = Number(res3)
-//         // })
-//
-//         // calRes[i][0] = item[0]
-//         // calRes[i][1] = CalIncome(item[1])
-//         // calRes[i][2] = CalExpense(item[1])
-//         // calRes[i][3] = CalLeft(item[1])
-//     }
-// }
+@Concurrent
+function calMoney(billInfo:BillInfoType[]):reNumber {
+    let yearlyExpense: number = 0;
+    let yearlyIncome: number = 0;
+    let yearlyLeft: number = 0;
 
+    billInfo.forEach((bill) => {
+        isExpense(bill) ? yearlyExpense += Math.abs(bill.money) : yearlyIncome += Math.abs(bill.money)
+    })
+    yearlyLeft = yearlyIncome - yearlyExpense;
+    return {
+        yearlyLeft:yearlyLeft,
+        yearlyIncome:yearlyIncome,
+        yearlyExpense:yearlyExpense
+    };
+
+}
 @Entry
 @Component
 struct BillInfos {
@@ -73,35 +36,25 @@ struct BillInfos {
     @State yearlyIncome: number = 0;
     @State BillsByMon: Map<number, BillInfoType[]> = SpliteBillsByMon(this.billInfo, this.activeDate);
 
-    @State calRes: Array<Array<number>> = new Array<Array<number>>();
-
     updateTotalNumber():void {
         this.yearlyLeft = 0;
         this.yearlyIncome = 0;
         this.yearlyExpense = 0;
+        let BillsByMon = Array.from(this.BillsByMon.entries());
+        let tasks: taskpool.Task[] = []
+
         this.BillsByMon.forEach((item) => {
-            item.forEach((bill) => {
-                isExpense(bill) ? this.yearlyExpense += Math.abs(bill.money) : this.yearlyIncome += Math.abs(bill.money)
+            let task: taskpool.Task = new taskpool.Task(calMoney,item)
+            tasks.push(task);
+        })
+        tasks.forEach((task)=>{
+            taskpool.execute(task).then((ret)=>{
+                this.yearlyExpense += (ret as reNumber).yearlyExpense;
+                this.yearlyIncome += (ret as reNumber).yearlyIncome;
+                this.yearlyLeft += (ret as reNumber).yearlyLeft;
             })
         })
-        this.yearlyLeft = this.yearlyIncome - this.yearlyExpense;
     }
-
-    // async aboutToAppear() {
-    //     let tmp: number = 0
-    //     for (let item of Array.from(this.BillsByMon.entries())) {
-    //         this.calRes.push(new Array<number>())
-    //         this.calRes[tmp].push(0)
-    //         this.calRes[tmp].push(0)
-    //         this.calRes[tmp].push(0)
-    //         this.calRes[tmp].push(0)
-    //
-    //         tmp++
-    //     }
-    //     await CalculateIncome(this.calRes, this.BillsByMon)
-    //     await CalculateExpense(this.calRes, this.BillsByMon)
-    //     await CalculateLeft(this.calRes, this.BillsByMon)
-    // }
 
     onPageShow(): void {
         this.updateTotalNumber();
@@ -237,34 +190,6 @@ struct BillInfos {
                                             .width('100%')
                                         }
                                     })
-                                // ForEach(this.calRes,
-                                //     (item: Array<number>) => {
-                                //         ListItem() {
-                                //             GridRow({ columns: 4 }) {
-                                //                 GridCol() {
-                                //                     Text(`${item[0]}月`).fontSize(16)
-                                //                 }
-                                //
-                                //                 GridCol() {
-                                //                     Text(`${item[1]}`).fontSize(14)
-                                //                 }
-                                //
-                                //                 GridCol() {
-                                //                     Text(`${item[2]}`).fontSize(14)
-                                //                 }
-                                //
-                                //                 GridCol() {
-                                //                     Text(`${item[3]}`).fontSize(14)
-                                //                 }
-                                //             }
-                                //             .padding(12)
-                                //             .border({
-                                //                 width: { top: 0.5 },
-                                //                 color: $r("app.color.text_gray")
-                                //             })
-                                //             .width('100%')
-                                //         }
-                                //     })
                             }.listDirection(Axis.Vertical)
                         }
                         .width('100%')

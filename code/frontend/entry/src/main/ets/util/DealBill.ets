@@ -9,39 +9,6 @@ import {http_url} from '../common/trans'
 import { taskpool } from '@kit.ArkTS'
 import mediaquery from '@ohos.mediaquery'
 
-// export class IndexParams1 {
-//     billInfo: BillInfoType[] = []
-//     BillsByDate: Map<string, BillInfoType[]> = new Map()
-//     selectedDate: Date = new Date()
-// }
-//
-// export class IndexParams2 {
-//     currentBreakpoint: string = 'md'
-//     xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)')
-//     smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)')
-//     mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)')
-//     lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)')
-// }
-
-// @Concurrent
-// export function concurrentRegister(xsListener: mediaquery.MediaQueryListener, smListener: mediaquery.MediaQueryListener, mdListener: mediaquery.MediaQueryListener, lgListener: mediaquery.MediaQueryListener, currentBreakpoint: string): string {
-//     let res: string = ''
-//     if (xsListener.matches) {
-//         if (currentBreakpoint != 'xs') res = 'xs'
-//     }
-//     if (smListener.matches) {
-//         if (currentBreakpoint != 'sm') res = 'sm'
-//     }
-//     if (mdListener.matches) {
-//         if (currentBreakpoint != 'md') res = 'md'
-//     }
-//     if (lgListener.matches) {
-//         if (currentBreakpoint != 'lg') res = 'lg'
-//     }
-//
-//     return res
-// }
-
 /*
 *   由于判断支出收入的数据定义暂时还未确定
 *   此处仅仅是一个暂时判断——money<0为支出,否则为收入
@@ -81,12 +48,7 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
         } else {
             console.error(`Date ${date} was not initialized correctly.`);
         }
-
-        // let task: taskpool.Task = new taskpool.Task(spliteByDate, bill, selectedMon, selectedYear, month, year, groupedBills, date);
-        // tasks.push(task);
     });
-
-    // tasks.forEach(task => {taskpool.execute(task)});
 
     return groupedBills;
 }
@@ -118,12 +80,7 @@ export function SpliteBillsByMon(billinfos: BillInfoType[], selectedDate: Date):
         } else {
             console.error(`Date ${month} was not initialized correctly.`);
         }
-
-        // let task: taskpool.Task = new taskpool.Task(spliteByMon, bill, selectedYear, month, year, groupedBills, date);
-        // tasks.push(task);
     });
-
-    // tasks.forEach(task => {taskpool.execute(task)});
 
     return groupedBills;
 }
