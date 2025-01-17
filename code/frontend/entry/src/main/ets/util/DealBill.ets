@@ -9,38 +9,38 @@ import {http_url} from '../common/trans'
 import { taskpool } from '@kit.ArkTS'
 import mediaquery from '@ohos.mediaquery'
 
-export class IndexParams1 {
-    billInfo: BillInfoType[] = []
-    BillsByDate: Map<string, BillInfoType[]> = new Map()
-    selectedDate: Date = new Date()
-}
+// export class IndexParams1 {
+//     billInfo: BillInfoType[] = []
+//     BillsByDate: Map<string, BillInfoType[]> = new Map()
+//     selectedDate: Date = new Date()
+// }
+//
+// export class IndexParams2 {
+//     currentBreakpoint: string = 'md'
+//     xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)')
+//     smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)')
+//     mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)')
+//     lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)')
+// }
 
-export class IndexParams2 {
-    currentBreakpoint: string = 'md'
-    xsListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(0vp<width<320vp)')
-    smListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(320vp<width<600vp)')
-    mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)')
-    lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)')
-}
-
-@Concurrent
-export function concurrentRegister(xsListener: mediaquery.MediaQueryListener, smListener: mediaquery.MediaQueryListener, mdListener: mediaquery.MediaQueryListener, lgListener: mediaquery.MediaQueryListener, currentBreakpoint: string): string {
-    let res: string = ''
-    if (xsListener.matches) {
-        if (currentBreakpoint != 'xs') res = 'xs'
-    }
-    if (smListener.matches) {
-        if (currentBreakpoint != 'sm') res = 'sm'
-    }
-    if (mdListener.matches) {
-        if (currentBreakpoint != 'md') res = 'md'
-    }
-    if (lgListener.matches) {
-        if (currentBreakpoint != 'lg') res = 'lg'
-    }
-
-    return res
-}
+// @Concurrent
+// export function concurrentRegister(xsListener: mediaquery.MediaQueryListener, smListener: mediaquery.MediaQueryListener, mdListener: mediaquery.MediaQueryListener, lgListener: mediaquery.MediaQueryListener, currentBreakpoint: string): string {
+//     let res: string = ''
+//     if (xsListener.matches) {
+//         if (currentBreakpoint != 'xs') res = 'xs'
+//     }
+//     if (smListener.matches) {
+//         if (currentBreakpoint != 'sm') res = 'sm'
+//     }
+//     if (mdListener.matches) {
+//         if (currentBreakpoint != 'md') res = 'md'
+//     }
+//     if (lgListener.matches) {
+//         if (currentBreakpoint != 'lg') res = 'lg'
+//     }
+//
+//     return res
+// }
 
 /*
 *   由于判断支出收入的数据定义暂时还未确定
@@ -138,7 +138,7 @@ export function CalBill(BillsByDate:Map<string, BillInfoType[]>):[ number,number
 
     BillsByDate.forEach(item =>{
        item.forEach(bill =>{
-           if(isExpense(bill)){
+           if(bill.type <= 17){
                totalExpense += bill.money;
            }
            else{
@@ -150,26 +150,29 @@ export function CalBill(BillsByDate:Map<string, BillInfoType[]>):[ number,number
     return [totalExpense,totalIncome];
 }
 
+@Concurrent
 export function CalExpense(BillInfos:BillInfoType[]):number {
     let totalExpense = 0;
     BillInfos.forEach((bill)=>{
-        if(isExpense(bill)) totalExpense += Math.abs(bill.money);
+        if(bill.type <= 17) totalExpense += Math.abs(bill.money);
     })
     return totalExpense;
 }
 
+@Concurrent
 export function CalIncome(BillInfos:BillInfoType[]):number {
     let totalIncome = 0;
     BillInfos.forEach((bill)=>{
-        if(!isExpense(bill)) totalIncome += Math.abs(bill.money);
+        if(bill.type > 17) totalIncome += Math.abs(bill.money);
     })
     return totalIncome;
 }
 
+@Concurrent
 export function CalLeft(BillInfos:BillInfoType[]):number {
     let totalLeft = 0;
     BillInfos.forEach((bill)=>{
-        (isExpense(bill))? totalLeft -= Math.abs(bill.money):totalLeft += Math.abs(bill.money);
+        (bill.type <= 17)? totalLeft -= Math.abs(bill.money):totalLeft += Math.abs(bill.money);
     })
     return totalLeft;
 }

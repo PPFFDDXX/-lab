@@ -4,13 +4,11 @@ import { BillInfoType, TempBills } from '../model/BillInfoType'
 import { ProfilePage } from '../pages/ProfilePage'
 import { CustomTabBar } from '../components/CustomTabBar'
 import { BillPage } from '../components/BillPage'
-import { getData } from '../pages/AddBalance'
 import mediaquery from '@ohos.mediaquery';
 import axios, { AxiosResponse } from '@ohos/axios'
-import { CalBill, CalIncome, SpliteBillsByDate, userData, concurrentRegister, IndexParams1, IndexParams2 } from '../util/DealBill'
+import { CalBill, CalIncome, SpliteBillsByDate, userData } from '../util/DealBill'
 import { ap, bills, http_url } from '../common/trans'
 import { http } from '@kit.NetworkKit'
-import { taskpool } from '@kit.ArkTS'
 
 let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
 
@@ -78,21 +76,21 @@ struct Index {
     onPageHide(): void {
     }
 
-    async aboutToAppear(): Promise<void> {
-        // this.billInfo = TempBills;
-        // axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
-        //     .then((response: AxiosResponse) => {
-        //         console.log("读取数据");
-        //         this.billInfo = response.data['datas']
-        //         this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
-        //     }
-        //     )
-        // this.registerBreakpoint()
-        let task1: taskpool.Task = new taskpool.Task(getData, this.billInfo, this.BillsByDate, this.selectedDate)
-        let task2: taskpool.Task = new taskpool.Task(concurrentRegister, this.xsListener, this.smListener, this.mdListener, this.lgListener, this.currentBreakpoint)
-
-        this.BillsByDate = new Map(Object.entries(await taskpool.execute(task1)))
-        this.updateCurrentBreakpoint(String(await taskpool.execute(task2)))
+    aboutToAppear(){
+        this.billInfo = TempBills;
+        axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
+            .then((response: AxiosResponse) => {
+                console.log("读取数据");
+                this.billInfo = response.data['datas']
+                this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
+            }
+            )
+        this.registerBreakpoint()
+        // let task1: taskpool.Task = new taskpool.Task(getData, this.billInfo, this.BillsByDate, this.selectedDate)
+        // let task2: taskpool.Task = new taskpool.Task(concurrentRegister, this.xsListener, this.smListener, this.mdListener, this.lgListener, this.currentBreakpoint)
+        //
+        // this.BillsByDate = new Map(Object.entries(await taskpool.execute(task1)))
+        // this.updateCurrentBreakpoint(String(await taskpool.execute(task2)))
     }
 
     onPageShow(): void {

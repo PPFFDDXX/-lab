@@ -1,6 +1,25 @@
 import { BillInfoType } from '../model/BillInfoType';
 import { CalExpense, CalIncome, CalLeft, isExpense, SpliteBillsByMon } from '../util/DealBill';
 import { router } from '@kit.ArkUI';
+import { taskpool } from '@kit.ArkTS'
+
+async function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<number, BillInfoType[]>){
+    let i: number = 0
+    for (let item of Array.from(BillsByMon.entries())) {
+        let task1: taskpool.Task = new taskpool.Task(CalIncome, item[1])
+        let task2: taskpool.Task = new taskpool.Task(CalExpense, item[1])
+        let task3: taskpool.Task = new taskpool.Task(CalLeft, item[1])
+
+        calRes.push(new Array<number>())
+
+        calRes[i].push(item[0])
+        calRes[i].push(Number(await taskpool.execute(task1)))
+        calRes[i].push(Number(await taskpool.execute(task2)))
+        calRes[i].push(Number(await taskpool.execute(task3)))
+
+        i++
+    }
+}
 
 @Entry
 @Component
@@ -12,6 +31,8 @@ struct BillInfos {
     @State yearlyIncome: number = 0;
     @State BillsByMon: Map<number, BillInfoType[]> = SpliteBillsByMon(this.billInfo, this.activeDate);
 
+    @State calRes: Array<Array<number>> = new Array<Array<number>>();
+
     updateTotalNumber():void {
         this.yearlyLeft = 0;
         this.yearlyIncome = 0;
@@ -22,6 +43,10 @@ struct BillInfos {
             })
         })
         this.yearlyLeft = this.yearlyIncome - this.yearlyExpense;
+    }
+
+    aboutToAppear(): void {
+        CalculateExpense(this.calRes, this.BillsByMon)
     }
 
     onPageShow(): void {
@@ -130,8 +155,36 @@ struct BillInfos {
 
                         Row() {
                             List() {
-                                ForEach(Array.from(this.BillsByMon.entries()),
-                                    (item: [mon: number, bills: BillInfoType[]]) => {
+                                // ForEach(Array.from(this.BillsByMon.entries()),
+                                //     (item: [mon: number, bills: BillInfoType[]]) => {
+                                //         ListItem() {
+                                //             GridRow({ columns: 4 }) {
+                                //                 GridCol() {
+                                //                     Text(`${item[0]}月`).fontSize(16)
+                                //                 }
+                                //
+                                //                 GridCol() {
+                                //                     Text(`${CalIncome(item[1])}`).fontSize(14)
+                                //                 }
+                                //
+                                //                 GridCol() {
+                                //                     Text(`${CalExpense(item[1])}`).fontSize(14)
+                                //                 }
+                                //
+                                //                 GridCol() {
+                                //                     Text(`${CalLeft(item[1])}`).fontSize(14)
+                                //                 }
+                                //             }
+                                //             .padding(12)
+                                //             .border({
+                                //                 width: { top: 0.5 },
+                                //                 color: $r("app.color.text_gray")
+                                //             })
+                                //             .width('100%')
+                                //         }
+                                //     })
+                                ForEach(this.calRes,
+                                    (item: Array<number>) => {
                                         ListItem() {
                                             GridRow({ columns: 4 }) {
                                                 GridCol() {
@@ -139,15 +192,15 @@ struct BillInfos {
                                                 }
 
                                                 GridCol() {
-                                                    Text(`${CalIncome(item[1])}`).fontSize(14)
+                                                    Text(`${item[1]}`).fontSize(14)
                                                 }
 
                                                 GridCol() {
-                                                    Text(`${CalExpense(item[1])}`).fontSize(14)
+                                                    Text(`${item[2]}`).fontSize(14)
                                                 }
 
                                                 GridCol() {
-                                                    Text(`${CalLeft(item[1])}`).fontSize(14)
+                                                    Text(`${item[3]}`).fontSize(14)
                                                 }
                                             }
                                             .padding(12)
