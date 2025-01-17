@@ -10,12 +10,10 @@ async function CalculateExpense(calRes: Array<Array<number>>, BillsByMon: Map<nu
         let task2: taskpool.Task = new taskpool.Task(CalExpense, item[1])
         let task3: taskpool.Task = new taskpool.Task(CalLeft, item[1])
 
-        calRes.push(new Array<number>())
-
-        calRes[i].push(item[0])
-        calRes[i].push(Number(await taskpool.execute(task1)))
-        calRes[i].push(Number(await taskpool.execute(task2)))
-        calRes[i].push(Number(await taskpool.execute(task3)))
+        calRes[i][0] = item[0]
+        calRes[i][1] = Number(await taskpool.execute(task1))
+        calRes[i][2] = Number(await taskpool.execute(task2))
+        calRes[i][3] = Number(await taskpool.execute(task3))
 
         i++
     }
@@ -46,6 +44,15 @@ struct BillInfos {
     }
 
     aboutToAppear(): void {
+        let tmp: number = 0
+        for (let item of Array.from(this.BillsByMon.entries())) {
+            this.calRes.push(new Array<number>())
+            this.calRes[tmp].push(0)
+            this.calRes[tmp].push(0)
+            this.calRes[tmp].push(0)
+
+            tmp++
+        }
         CalculateExpense(this.calRes, this.BillsByMon)
     }
 
