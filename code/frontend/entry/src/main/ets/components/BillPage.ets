@@ -116,7 +116,7 @@ export struct BillPage {
                 .height('70%')
                 .justifyContent(FlexAlign.Center)
                 .alignItems(HorizontalAlign.Center)
-                .width('100%')
+                .width('97%')//留紫色边框
                 .borderRadius({ topLeft: 20, topRight: 20 })
                 .backgroundColor(Color.White)
                 .padding({ bottom:100 })
@@ -149,7 +149,7 @@ export struct BillPage {
                                 .width('100%')
                             })
                     }
-                    .width('97%')
+                    .width('97%')//留紫色边框
                     .height('67%')
                     .borderRadius({ topLeft: 20, topRight: 20 })
                     .backgroundColor(Color.White)
@@ -185,7 +185,7 @@ export struct BillPage {
                         .size({ height: 36, width: 36 })
                         .borderRadius(8)
                         .padding(8)
-                        .backgroundColor(isExpense(billInfo)?'#ffe2effd':'#ffe2ef')
+                        .backgroundColor(isExpense(billInfo)?'#ffe2effd':'#ffe2ef')//收入为红色图标 支出为蓝色图标
                         .margin({ right: 16 })
                     Text(defaultType[billInfo.type].title)
                         .fontSize(12)
@@ -199,7 +199,7 @@ export struct BillPage {
             .margin({left:16,right:16})
             .width('90%')
             .borderRadius(8)
-            .backgroundColor('#F5F5F5')
+            .backgroundColor('#F5F5F5')//灰色背景
             .justifyContent(FlexAlign.SpaceBetween)
             .gesture(LongPressGesture({ repeat: true })
                 // 这里是长按调用

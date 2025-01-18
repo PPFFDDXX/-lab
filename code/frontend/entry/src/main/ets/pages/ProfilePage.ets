@@ -30,7 +30,7 @@ export struct ProfilePage{
   build() {
     Stack(){
       Column(){
-        Image(/*this.token?this.userInfo.avatarUrl:*/$r('app.media.user_avatar'))
+        Image(/*this.token?this.userInfo.avatarUrl:*/$r('app.media.user_avatar')) //头像
           .width(100)
           .height(100)
           .borderRadius(50)
@@ -40,12 +40,12 @@ export struct ProfilePage{
           router.pushUrl({url:'pages/LoginPage'})
         })
         */
-        Text((ap.account != null)?ap.account:"abc")
+        Text((ap.account != null)?ap.account:"abc") //用户名
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor(Color.Black)
           .margin({top:20})
-        /*
+        /*    //可能的点击头像登录实现
         if (!this.token) {
           Text('请点击头像登录')
             .fontSize(12)
@@ -58,11 +58,11 @@ export struct ProfilePage{
       .width('100%')
       .height('50%')
       .backgroundColor('#9595ca')
-      .backgroundImage(/*this.token?this.userInfo.avatarUrl:*/$r('app.media.user_avatar_b'))
+      .backgroundImage(/*this.token?this.userInfo.avatarUrl:*/$r('app.media.user_avatar_b')) //背景图(和用户头像相同)
       .backgroundImageSize({ height: '100%', width: '100%' })
-      .backgroundBlurStyle(BlurStyle.Regular)
+      .backgroundBlurStyle(BlurStyle.Regular)//模糊化
 
-      Column({space:10}){
+      Column({space:10}){ //个人中心几个可点击项目
         this.mineItemBuilder($r('app.media.ic_mine_team'),'开发团队','前端成员：xyf，wy，wzd，ysy\n后端成员：zbc，xqx，hxy')
         Divider()
         this.mineItemBuilder($r('app.media.ic_mine_update'),'检查更新','已是最新版本')
@@ -79,7 +79,7 @@ export struct ProfilePage{
             .fontColor(Color.White)
             .onClick(() => {
               if (this.dialogController != null) {
-                this.dialogController.open()
+                this.dialogController.open()//重复确认弹窗的弹出
               }
             })
         }
@@ -96,7 +96,7 @@ export struct ProfilePage{
     .alignContent(Alignment.Top)
   }
   @Builder
-  dialogItemBuilder(icon:Resource,title:string){
+  dialogItemBuilder(icon:Resource,title:string){ //用于可点击项目的构建
     Row({space:10}){
       Image(icon)
         .width(24)
@@ -106,7 +106,7 @@ export struct ProfilePage{
         .height(24)
         .fontWeight(FontWeight.Medium)
         .fontColor(Color.Black)
-      Blank()
+      Blank() //下面内容右对齐
       Image($r('app.media.ic_arrow_right'))
         .width(24)
         .height(24)
@@ -118,13 +118,15 @@ export struct ProfilePage{
       AlertDialog.show({
         title: 'Please star our repository',
         message: text,
-        autoCancel: true,
+        autoCancel: true,//点击外侧空间可关闭dialog
         cancel: () => { },
-        alignment: DialogAlignment.Bottom,
+        alignment: DialogAlignment.Bottom,//dialog出现在页面底部
         offset: { dx: 0, dy: -20 },
+        //按钮功能设置
         primaryButton: {
           value: "复制",
           action: () => {
+            //将网址复制到剪贴板
             const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'https://github.com/PPFFDDXX/Harmony-OS-lab');
             const systemPasteboard = pasteboard.getSystemPasteboard();
             systemPasteboard.setData(pasteboardData);
@@ -133,11 +135,11 @@ export struct ProfilePage{
             });
           }
         },
-        secondaryButton: {
+        secondaryButton: { //虚拟机无浏览器,跳转功能无法有具体表现(是照着官方文档写的,应该没问题,日志也输出了正确内容)
           value: "跳转",
           action: () => {
             try {
-              let want:Want = {
+              let want:Want = {//利用Want方法进行跳转
                 action: 'ohos.want.action.viewData',
                 entities: ['entity.system.browsable'],
                 uri: 'https://github.com/PPFFDDXX/Harmony-OS-lab'
@@ -154,7 +156,7 @@ export struct ProfilePage{
     })
   }
   @Builder
-  mineItemBuilder(icon:Resource,title:string,text:string){
+  mineItemBuilder(icon:Resource,title:string,text:string){ //用于可点击项目的构建
     Row({space:10}){
       Image(icon)
         .width(24)
@@ -179,7 +181,7 @@ export struct ProfilePage{
 
 }
 @CustomDialog
-struct CustomDialogDemo {
+struct CustomDialogDemo { // 用于退出登录重复确认弹窗的构建
   controller?: CustomDialogController
   cancel: () => void = () => {
   }
@@ -201,6 +203,7 @@ struct CustomDialogDemo {
         /*Divider().vertical(true).height(40).opacity(4).margin({ left: 0, right: 0 })*/
         Button('退出')
           .onClick(() => {
+            //replace到LoginPage
             if (this.controller != undefined) {
               ap.account = null;
               router.replaceUrl({
