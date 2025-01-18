@@ -4,7 +4,7 @@ import { pasteboard } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import Want from '@ohos.app.ability.Want';
 import Router from '@system.router';
-import { ap } from '../common/trans';
+import { ap, bills } from '../common/trans';
 
 @Component
 export struct ProfilePage{
@@ -204,6 +204,7 @@ struct CustomDialogDemo { // 用于退出登录重复确认弹窗的构建
         Button('退出')
           .onClick(() => {
             //replace到LoginPage
+            bills.isChanged = true;
             if (this.controller != undefined) {
               ap.account = null;
               router.replaceUrl({

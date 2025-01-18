@@ -2,7 +2,7 @@ import { BillInfoType } from '../model/BillInfoType';
 import { CalBill, SpliteBillsByDate } from '../util/DealBill';
 import { FormatDate } from '../util/DealTime'
 import { promptAction } from '@kit.ArkUI';
-
+import { ap } from '../common/trans';
 
 
 @Component
@@ -12,6 +12,9 @@ export struct BalanceViewer {
     @Link totalBalance: number;
     @Link billInfo: BillInfoType[]
     @Link BillsByDate: Map<string, BillInfoType[]>
+
+
+
 
     UpdateTotalMoney():void {
         //UI更新当月总支出和总收入
@@ -24,9 +27,8 @@ export struct BalanceViewer {
         this.UpdateTotalMoney()
     }
 
-    onPageShow(): void {
-        this.UpdateTotalMoney()
-    }
+
+
 
     build() {
         Column() {
@@ -131,5 +133,6 @@ export struct BalanceViewer {
             })
             .margin({ top: 0 })
         }.width('100%')
+
     }
 }

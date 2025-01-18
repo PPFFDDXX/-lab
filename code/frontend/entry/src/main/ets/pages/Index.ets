@@ -48,6 +48,8 @@ struct Index {
     private mdListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(600vp<width<840vp)');
     private lgListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(840vp<=width)');
 
+
+
     registerBreakpoint() {
         if (this.xsListener.matches) {
             this.updateCurrentBreakpoint('xs')
@@ -77,15 +79,19 @@ struct Index {
     }
 
     aboutToAppear(){
-        this.billInfo = TempBills;
+        // this.billInfo = TempBills;
         axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
             .then((response: AxiosResponse) => {
                 console.log("读取数据");
                 this.billInfo = response.data['datas']
                 this.BillsByDate = SpliteBillsByDate(this.billInfo,this.selectedDate);
+                const Obj:[number,number] = CalBill(this.BillsByDate);
+                this.totalBalance = Obj[0];
+                this.totalIncome = Obj[1];
             }
             )
         this.registerBreakpoint()
+
         // let task1: taskpool.Task = new taskpool.Task(getData, this.billInfo, this.BillsByDate, this.selectedDate)
         // let task2: taskpool.Task = new taskpool.Task(concurrentRegister, this.xsListener, this.smListener, this.mdListener, this.lgListener, this.currentBreakpoint)
         //
@@ -96,9 +102,9 @@ struct Index {
     onPageShow(): void {
         let isChanged: boolean = bills.isChanged;
         if(isChanged){
-
             axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
                 .then((response: AxiosResponse) => {
+                    this.selectedDate = new Date();
                     console.log("读取数据");
                     console.log(response.data['data']);
                     this.billInfo = response.data['datas']
@@ -110,6 +116,7 @@ struct Index {
                 )
             bills.isChanged = false;
         }
+
     }
 
     build() {
