@@ -6,9 +6,9 @@ from datetime import datetime
 app = Flask(__name__)
 
 HOSTNAME = "127.0.0.1" # 数据库host
-PORT = 3306 # 数据库端口号
+PORT = 3307 # 数据库端口号
 USERNAME = "root" # 用户名
-PASSWORD = "" # mysql密码
+PASSWORD = "235813xYf" # mysql密码
 DATABASE = "harmony"  # 数据库名称
 
 

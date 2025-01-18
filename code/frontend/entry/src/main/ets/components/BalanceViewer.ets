@@ -22,7 +22,10 @@ export struct BalanceViewer {
 
     aboutToAppear(): void {
         this.UpdateTotalMoney()
+    }
 
+    onPageShow(): void {
+        this.UpdateTotalMoney()
     }
 
     build() {

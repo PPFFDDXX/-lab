@@ -1,3 +1,8 @@
+/*
+bill类型，用typeID判断支出收入
+ */
+
+
 export interface IBillType {
     typeID:number; title: string; img: Resource;
 }

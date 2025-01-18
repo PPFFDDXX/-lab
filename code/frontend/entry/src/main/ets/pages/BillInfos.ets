@@ -3,14 +3,15 @@ import { CalExpense, CalIncome, CalLeft, isExpense, SpliteBillsByMon } from '../
 import { router } from '@kit.ArkUI';
 import { taskpool } from '@kit.ArkTS'
 
-interface reNumber{
-    yearlyLeft:number ,
-    yearlyIncome:number ,
-    yearlyExpense:number
+interface reNumber {
+    yearlyLeft: number,
+    yearlyIncome: number,
+    yearlyExpense: number
 }
 
-@Concurrent//多线程部分
-function calMoney(billInfo:BillInfoType[]):reNumber {
+@Concurrent
+//多线程部分
+function calMoney(billInfo: BillInfoType[]): reNumber {
     let yearlyExpense: number = 0;
     let yearlyIncome: number = 0;
     let yearlyLeft: number = 0;
@@ -20,12 +21,13 @@ function calMoney(billInfo:BillInfoType[]):reNumber {
     })
     yearlyLeft = yearlyIncome - yearlyExpense;
     return {
-        yearlyLeft:yearlyLeft,
-        yearlyIncome:yearlyIncome,
-        yearlyExpense:yearlyExpense
+        yearlyLeft: yearlyLeft,
+        yearlyIncome: yearlyIncome,
+        yearlyExpense: yearlyExpense
     };
 
 }
+
 @Entry
 @Component
 struct BillInfos {
@@ -36,7 +38,7 @@ struct BillInfos {
     @State yearlyIncome: number = 0;
     @State BillsByMon: Map<number, BillInfoType[]> = SpliteBillsByMon(this.billInfo, this.activeDate);
 
-    updateTotalNumber():void {
+    updateTotalNumber(): void {
         this.yearlyLeft = 0;
         this.yearlyIncome = 0;
         this.yearlyExpense = 0;
@@ -44,14 +46,16 @@ struct BillInfos {
         let tasks: taskpool.Task[] = []
 
         this.BillsByMon.forEach((item) => {
-            let task: taskpool.Task = new taskpool.Task(calMoney,item)
+            let task: taskpool.Task = new taskpool.Task(calMoney, item)
             tasks.push(task);
         })
-        tasks.forEach((task)=>{
-            taskpool.execute(task).then((ret)=>{
+        tasks.forEach((task) => {
+            taskpool.execute(task).then((ret) => {
                 this.yearlyExpense += (ret as reNumber).yearlyExpense;
                 this.yearlyIncome += (ret as reNumber).yearlyIncome;
                 this.yearlyLeft += (ret as reNumber).yearlyLeft;
+            }).catch((e: object) => {
+                console.info("task5 catch e: " + e);
             })
         })
     }
@@ -85,7 +89,7 @@ struct BillInfos {
                             start: new Date("2000-01"),
                             onAccept: (v) => {
                                 this.activeDate.setFullYear(v.year, v.month, v.day);
-                                this.BillsByMon= SpliteBillsByMon(this.billInfo, this.activeDate);
+                                this.BillsByMon = SpliteBillsByMon(this.billInfo, this.activeDate);
                                 this.updateTotalNumber();
                             }
                         })
@@ -99,12 +103,13 @@ struct BillInfos {
 
                 Row() {
                     Column() {
-                        Row(){
+                        Row() {
                             Text("年结余").fontSize(14).fontColor('#ffffff').margin(4).height(22)
                         }
                         .width('100%')
                         .justifyContent(FlexAlign.Start)
-                        Row(){
+
+                        Row() {
                             Text(`${this.yearlyLeft}`).fontSize(28).fontColor('#ffffff').margin(4).height(36)
                         }
                         .width('100%')

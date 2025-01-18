@@ -108,20 +108,20 @@ struct LauncherPage {
             //
             if (response && response.data['status'] == -2) {
                 this.getUIContext().getPromptAction().showToast({
-                    message: '不存在的账号',
+                    message: response.data['message'],
                     duration: 2000
                 })
                 return
             } else if (response && response.data['status'] == -1) {
                 this.getUIContext().getPromptAction().showToast({
-                    message: '密码错误',
+                    message: response.data['message'],
                     duration: 2000
                 })
                 return
             }
             ap.account = this.account
             this.getUIContext().getPromptAction().showToast({
-                message: "登录成功",
+                message: response.data['message'],
                 duration: 2000
             })
             this.getUIContext().getRouter().replaceUrl({

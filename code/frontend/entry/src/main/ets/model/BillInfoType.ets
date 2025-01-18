@@ -24,8 +24,8 @@ export class BillInfoType {
 // 临时数据，用于测试
 export const TempBills: BillInfoType[] = [
     new BillInfoType("test", 0, 2, 34, "哈哈", "2025-1-14"),
-    new BillInfoType("test", 1, 1, 345.65, "bu哈哈", "2025-1-14"),
-    new BillInfoType("test", 2, 4, 10000, "爽了", "2025-1-14"),
+    new BillInfoType("test", 1, 1, 345.65, "不哈哈", "2025-1-14"),
+    new BillInfoType("test", 2, 4, 10000, "对吗", "2025-1-14"),
     new BillInfoType("test", 3, 6, 3, "bu哈哈", "2025-1-13"),
     new BillInfoType("test", 4, 20, 100, "xxs", "2025-2-12")
 

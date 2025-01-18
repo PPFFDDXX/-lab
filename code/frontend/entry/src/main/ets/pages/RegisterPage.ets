@@ -108,7 +108,7 @@ struct RegisterPage {
                         if (response.data['status'] == -3) {
                             console.log("账号已存在")
                             this.getUIContext().getPromptAction().showToast({
-                                message: '账号已存在',
+                                message: response.data['message'],
                                 duration: 2000
                             })
                             return
@@ -123,7 +123,7 @@ struct RegisterPage {
                         // 下面是注册成功
                         ap.account = this.account;
                         this.getUIContext().getPromptAction().showToast({
-                            message: '注册成功',
+                            message: response.data['message'],
                             duration: 2000
                         })
                         this.getUIContext().getRouter().back()

@@ -212,7 +212,7 @@ struct AddBalance {
         content: string,
         date: string) {
 
-        //这里调用add_data
+        //这里调用update_data
 
         axios.post<number, AxiosResponse<number>, updateForm>(http_url.url_simulator+'5000/api/update', {
             user_name: user_name,

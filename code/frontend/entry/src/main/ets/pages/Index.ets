@@ -15,9 +15,9 @@ let listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orient
 
 function onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
-        // do something here
+        // todo
     } else {
-        // do something here
+        // todo
     }
 }
 
@@ -96,10 +96,7 @@ struct Index {
     onPageShow(): void {
         let isChanged: boolean = bills.isChanged;
         if(isChanged){
-            this.getUIContext().getPromptAction().showToast({
-                'message':"重新获取数据",
-                'duration':2000
-            })
+
             axios.get<number, AxiosResponse<number>, null>(http_url.url_simulator+'5000/api/get_data/'+ap.account)
                 .then((response: AxiosResponse) => {
                     console.log("读取数据");

@@ -3,15 +3,12 @@
  */
 
 import {BillInfoType} from '../model/BillInfoType'
-import { FormatDate, Translate } from './DealTime';
-import axios, { AxiosResponse } from '@ohos/axios'
-import {http_url} from '../common/trans'
 import { taskpool } from '@kit.ArkTS'
-import mediaquery from '@ohos.mediaquery'
 
 /*
 *   由于判断支出收入的数据定义暂时还未确定
 *   此处仅仅是一个暂时判断——money<0为支出,否则为收入
+*   type <= 17 为支出
  */
 export function isExpense(billinfo:BillInfoType):boolean {
     return billinfo.type <= 17 ;
@@ -33,7 +30,7 @@ export function SpliteBillsByDate(billinfos: BillInfoType[], selectedDate: Date)
     const selectedMon: number = selectedDate.getMonth() + 1;
     const selectedYear: number = selectedDate.getFullYear();
 
-    let tasks: taskpool.Task[] = []
+    // let tasks: taskpool.Task[] = []
 
     billinfos.forEach(bill => {
         const date = bill.date; //  date 是字符串，格式为 'YYYY-MM-DD'

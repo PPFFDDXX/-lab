@@ -2,7 +2,6 @@
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import { BillInfoType } from '../model/BillInfoType';
-import { CommonConstants } from '../common/CommonConstants';
 
 @Component
 export struct FunctionSelect {
@@ -53,11 +52,7 @@ export struct FunctionSelect {
                         }.height(12).width(48)
                     }.width(48).alignItems(HorizontalAlign.Center)
                 }.backgroundColor(Color.Transparent).onClick(() => {
-                    router.pushUrl({
-                        url: 'pages/Copyright'
-                    }, router.RouterMode.Standard, err => {
-                        return;
-                    })
+                    return;
                 }).borderRadius(8)
 
                 Button({ type: ButtonType.Normal }) {

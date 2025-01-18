@@ -21,7 +21,7 @@ struct BIllDetail {
                     .width('100%')
                     .backgroundColor($r('app.color.main_theme_blue'))
                 Row() {
-                    SymbolGlyph($r('sys.symbol.arrow_up_left'))
+                    SymbolGlyph($r('sys.symbol.arrow_left'))
                         .size({ height: '30%', width: '30%' })
                         .onClick(() => {
                             router.back();
@@ -29,7 +29,7 @@ struct BIllDetail {
                         .width('10%')
                     Column({ space: 8 }) {
                         Image(defaultType[this.bill.type].img)
-                            .size({ height: 16, width: 16 })
+                            .size({ height: 20, width: 20 })
                         Text(defaultType[this.bill.type].title)
                             .fontSize(16)
                     }
@@ -45,7 +45,7 @@ struct BIllDetail {
                         .margin(0)
 
                 }
-                .height('8%')
+                .height('10%')
                 .width('100%')
                 .padding({ left: 12, right: 12 })
                 .justifyContent(FlexAlign.SpaceBetween)
